@@ -4,9 +4,13 @@ Kasir terpusat untuk foodcourt multi-vendor. Pelanggan bayar di satu kasir,
 sistem otomatis menghitung jatah tiap vendor (`harga_dasar`) dan margin owner
 (`margin`) per transaksi — tidak perlu lagi hitung manual misah-misah nota tiap sore.
 
-> **Status: Phase 1 (MVP) selesai.** Kasir bisa input pesanan multi-vendor,
-> terima pembayaran (cash/QRIS), dan owner bisa melihat rekap settlement harian
-> otomatis per vendor.
+> **Status: Phase 1 (MVP) + Phase 2 (Operasional) selesai.**
+>
+> - **Phase 1** — Kasir input pesanan multi-vendor, pembayaran cash/QRIS, rekap
+>   settlement harian otomatis per vendor.
+> - **Phase 2** — Tiket dapur per vendor, toggle sold-out realtime, portal vendor
+>   read-only, aturan diskon (margin/vendor/bagi dua), tutup shift + rekonsiliasi
+>   kas vs QRIS.
 
 ## Model Harga
 
@@ -60,7 +64,8 @@ php artisan serve
 
 Buka:
 - **Layar kasir:** http://localhost:8000/kasir (atau `/` → login)
-- **Panel admin:** http://localhost:8000/admin
+- **Panel admin:** http://localhost:8000/admin (owner/manager)
+- **Portal vendor:** http://localhost:8000/vendor (role vendor)
 
 ### Akun Demo
 
@@ -69,6 +74,7 @@ Buka:
 | owner@dmkuliner.test     | `password` | owner   | Kasir + Admin (semua)          |
 | manager@dmkuliner.test   | `password` | manager | Kasir + Admin (semua)          |
 | kasir@dmkuliner.test     | `password` | cashier | Hanya layar kasir              |
+| vendor@dmkuliner.test    | `password` | vendor  | Portal vendor (`/vendor`)      |
 
 ## Import Menu (CSV)
 
@@ -106,12 +112,15 @@ ringkasan margin harian, tabel per vendor, **Export CSV** daftar pembayaran).
 ```
 app/
   Console/Commands/ImportMenu.php        # artisan import:menu
-  Livewire/CashierScreen.php             # layar kasir (POS)
+  Livewire/CashierScreen.php             # layar kasir (POS): cart, diskon, shift
   Livewire/Auth/LoginForm.php            # login
   Services/SettlementService.php         # logika rekap settlement
-  Filament/Resources/                    # CRUD Location/Vendor/MenuItem/Order
+  Services/DiscountAllocator.php         # alokasi diskon ke base/margin per item
+  Filament/Resources/                    # admin: Location/Vendor/MenuItem/Order/Shift
   Filament/Pages/TutupHari.php           # halaman settlement + export CSV
-  Models/                                # Location, Vendor, MenuItem, Order, OrderItem, Settlement
+  Filament/Vendor/                       # portal vendor (panel terpisah /vendor)
+  Providers/Filament/                    # AdminPanelProvider, VendorPanelProvider
+  Models/                                # Location, Vendor, MenuItem, Order, OrderItem, Settlement, Shift
 database/
   data/menu-dmkuliner-seed.csv           # seed menu DM Kuliner
   migrations/                            # skema (dengan snapshot harga)
@@ -201,10 +210,22 @@ Certbot otomatis menambahkan blok `listen 443 ssl` + redirect HTTP→HTTPS.
 > Boleh 1 server PostgreSQL bersama app lain, **asal database-nya terpisah**
 > (`dmkuliner_pos`).
 
+## Fitur Phase 2 (operasional)
+
+- **Tiket dapur (KOT)** — di modal struk, tombol *Tiket Dapur* mencetak satu
+  tiket per vendor (tiap vendor hanya lihat item miliknya).
+- **Toggle sold-out realtime** — owner/manager dari admin, atau vendor dari
+  portalnya, bisa matikan menu habis; layar kasir auto-refresh (15 dtk).
+- **Portal vendor** (`/vendor`) — panel terpisah read-only: vendor lihat
+  penjualan & jatahnya sendiri (per tanggal, rincian per menu) + toggle menu.
+- **Aturan diskon** — diskon per transaksi, ditanggung oleh **margin saya**,
+  **vendor**, atau **bagi dua**; alokasi disnapshot per item, settlement
+  menyesuaikan otomatis.
+- **Tutup shift + rekonsiliasi** — buka shift (kas awal), tutup shift hitung
+  kas seharusnya (kas awal + penjualan tunai) vs kas fisik → selisih; total
+  QRIS terpisah. Riwayat di admin (**Laporan → Shift Kasir**).
+
 ## Roadmap
 
-- **Phase 2** — Kitchen ticket per vendor, toggle sold-out realtime, portal
-  vendor read-only, aturan diskon (margin/vendor/bagi dua), tutup shift &
-  rekonsiliasi cash vs QRIS.
 - **Phase 3** — Dashboard multi-lokasi, analitik (jam ramai, menu terlaris),
   pajak PB1, mode offline, audit log.
