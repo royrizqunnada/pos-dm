@@ -2,3 +2,20 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+/* Garis pemisah sidebar dengan konten + topbar (mode terang sama-sama putih). */
+.fi-sidebar {
+    border-right: 1px solid #e5e7eb;
+}
+
+.fi-topbar > nav {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dark .fi-sidebar {
+    border-right-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .fi-topbar > nav {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
