@@ -133,6 +133,24 @@ class CashierSettlementTest extends TestCase
         $this->actingAs($vendorUser)->get('/kasir')->assertForbidden();
     }
 
+    public function test_receipt_has_queue_number_and_thermal_layout(): void
+    {
+        Livewire::actingAs($this->cashier)
+            ->test(CashierScreen::class)
+            ->call('addToCart', $this->bakso->id)
+            ->call('addToCart', $this->kopi->id)
+            ->call('openPay')
+            ->set('cashReceived', 50000)
+            ->call('pay')
+            ->assertSee('DM KULINER')
+            ->assertSee('Antrian')
+            ->assertSee('Terima kasih');
+
+        $order = Order::firstOrFail();
+        $this->assertSame(1, $order->queue_number);
+        $this->assertStringStartsWith('DMK-', $order->order_number);
+    }
+
     public function test_settlement_totals_per_vendor(): void
     {
         $this->createPaidOrder([

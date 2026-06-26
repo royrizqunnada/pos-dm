@@ -249,56 +249,68 @@
     @if ($showReceipt && $this->lastOrder)
         @php($order = $this->lastOrder)
         <div class="print-layer fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:static print:bg-white print:p-0">
-            <div class="customer-receipt w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl print:max-w-none print:shadow-none" id="receipt">
-                <div class="text-center">
-                    <div class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 print:hidden">
-                        <svg class="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
-                    </div>
-                    <h3 class="text-lg font-bold text-gray-900">DM Kuliner</h3>
-                    <p class="text-xs text-gray-500">{{ optional($order->location)->name }}</p>
-                    <p class="mt-1 text-xs text-gray-500">{{ $order->order_number }} · {{ $order->created_at->format('d/m/Y H:i') }}</p>
-                    @if ($order->status === 'void')
-                        <p class="mt-2 inline-block rounded bg-red-50 px-2 py-1 text-xs font-bold text-red-600">DIBATALKAN</p>
-                    @endif
+            <div class="customer-receipt w-full max-w-[20rem] rounded-2xl bg-white p-6 font-mono text-[13px] leading-tight text-gray-900 shadow-xl print:max-w-none print:rounded-none print:p-2 print:shadow-none" id="receipt">
+                <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 print:hidden">
+                    <svg class="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
                 </div>
 
-                <div class="my-4 border-t border-dashed border-gray-200"></div>
+                {{-- Header --}}
+                <div class="text-center">
+                    <p class="text-base font-bold tracking-widest">DM KULINER</p>
+                    <p class="text-[11px] text-gray-600">Jl. Lingkar Utara, Komplek Arjuna, Randudongkal</p>
+                    <p class="text-[11px] text-gray-600">0812-xxxx-xxxx</p>
+                </div>
 
-                <div class="space-y-2">
-                    @foreach ($order->items as $item)
-                        <div class="flex justify-between text-sm">
-                            <div>
-                                <span class="font-medium text-gray-900">{{ $item->qty }}× {{ $item->name_snapshot }}</span>
-                                <span class="ml-1 text-xs text-gray-400">{{ optional($item->vendor)->code }}</span>
-                            </div>
-                            <span class="text-gray-700">{{ $rp($item->line_total) }}</span>
+                <div class="my-2 border-t border-dashed border-gray-400"></div>
+
+                {{-- Info transaksi --}}
+                <div class="space-y-0.5">
+                    <div class="flex"><span class="w-16 shrink-0">No</span><span>: {{ $order->order_number }}</span></div>
+                    <div class="flex"><span class="w-16 shrink-0">Tgl</span><span>: {{ $order->created_at->format('d/m/Y  H:i') }}</span></div>
+                    <div class="flex"><span class="w-16 shrink-0">Kasir</span><span>: {{ optional($order->cashier)->name ?? '-' }}</span></div>
+                    <div class="flex"><span class="w-16 shrink-0">Antrian</span><span>: <span class="font-bold">{{ $order->queue_number ?? '-' }}</span></span></div>
+                </div>
+
+                @if ($order->status === 'void')
+                    <p class="mt-2 text-center font-bold text-red-600">*** DIBATALKAN ***</p>
+                @endif
+
+                <div class="my-2 border-t border-dashed border-gray-400"></div>
+
+                {{-- Item dikelompokkan per vendor --}}
+                @foreach ($order->items->groupBy(fn ($i) => optional($i->vendor)->name) as $vendorName => $vendorItems)
+                    <p class="font-bold">[ {{ $vendorName ?: 'Lainnya' }} ]</p>
+                    @foreach ($vendorItems as $item)
+                        <p>{{ $item->name_snapshot }}</p>
+                        <div class="flex justify-between">
+                            <span class="pl-3 text-gray-600">{{ $item->qty }} x {{ number_format($item->selling_price_snapshot, 0, ',', '.') }}</span>
+                            <span>{{ number_format($item->line_total, 0, ',', '.') }}</span>
                         </div>
                     @endforeach
+                    <div class="h-2"></div>
+                @endforeach
+
+                <div class="border-t border-dashed border-gray-400"></div>
+
+                <div class="mt-2 space-y-0.5">
+                    <div class="flex justify-between"><span>Subtotal</span><span>{{ number_format($order->total_amount + $order->discount_amount, 0, ',', '.') }}</span></div>
+                    <div class="flex justify-between"><span>Diskon</span><span>{{ number_format($order->discount_amount, 0, ',', '.') }}</span></div>
                 </div>
 
-                <div class="my-4 border-t border-dashed border-gray-200"></div>
+                <div class="my-2 border-t border-dashed border-gray-400"></div>
 
-                <div class="space-y-1 text-sm">
-                    @if ($order->discount_amount > 0)
-                        <div class="flex justify-between text-gray-600">
-                            <span>Subtotal</span><span>{{ $rp($order->total_amount + $order->discount_amount) }}</span>
-                        </div>
-                        <div class="flex justify-between text-red-500">
-                            <span>Diskon</span><span>− {{ $rp($order->discount_amount) }}</span>
-                        </div>
-                    @endif
-                    <div class="flex justify-between font-bold text-gray-900">
-                        <span>Total</span><span>{{ $rp($order->total_amount) }}</span>
-                    </div>
-                    <div class="flex justify-between text-gray-600">
-                        <span>Bayar ({{ strtoupper($order->payment_method) }})</span><span>{{ $rp($order->paid_amount) }}</span>
-                    </div>
-                    <div class="flex justify-between text-gray-600">
-                        <span>Kembali</span><span>{{ $rp($order->change_amount) }}</span>
-                    </div>
+                <div class="flex justify-between text-base font-bold"><span>TOTAL</span><span>{{ number_format($order->total_amount, 0, ',', '.') }}</span></div>
+                <div class="mt-1 flex justify-between"><span>{{ $order->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</span><span>{{ number_format($order->paid_amount, 0, ',', '.') }}</span></div>
+                <div class="flex justify-between"><span>Kembali</span><span>{{ number_format($order->change_amount, 0, ',', '.') }}</span></div>
+
+                <div class="my-2 border-t border-dashed border-gray-400"></div>
+
+                {{-- Footer --}}
+                <div class="text-center text-[11px] leading-snug">
+                    <p>Terima kasih &amp; selamat menikmati!</p>
+                    <p>IG: {{ '@dmkuliner' }}</p>
+                    <p class="mt-1 text-gray-500">Simpan struk untuk komplain</p>
                 </div>
-
-                <p class="mt-4 text-center text-xs text-gray-400">Terima kasih 🙏</p>
 
                 <div class="mt-6 grid grid-cols-2 gap-3 print:hidden">
                     <button @click="doPrint('receipt')" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cetak Struk</button>

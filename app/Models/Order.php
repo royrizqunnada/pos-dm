@@ -16,6 +16,7 @@ class Order extends Model
         'cashier_id',
         'shift_id',
         'order_number',
+        'queue_number',
         'status',
         'payment_method',
         'total_amount',
@@ -28,6 +29,7 @@ class Order extends Model
     ];
 
     protected $casts = [
+        'queue_number' => 'integer',
         'total_amount' => 'integer',
         'discount_amount' => 'integer',
         'paid_amount' => 'integer',
@@ -57,11 +59,11 @@ class Order extends Model
     }
 
     /**
-     * Generate nomor order unik harian, mis. DM-20260626-0001.
+     * Generate nomor order unik harian, mis. DMK-260626-0001.
      */
     public static function generateOrderNumber(): string
     {
-        $prefix = 'DM-'.now()->format('Ymd').'-';
+        $prefix = 'DMK-'.now()->format('ymd').'-';
         $last = static::where('order_number', 'like', $prefix.'%')
             ->orderByDesc('order_number')
             ->value('order_number');
@@ -69,5 +71,15 @@ class Order extends Model
         $next = $last ? ((int) substr($last, -4)) + 1 : 1;
 
         return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Nomor antrian harian berikutnya untuk satu lokasi (reset tiap hari).
+     */
+    public static function nextQueueNumber(int $locationId): int
+    {
+        return (int) static::where('location_id', $locationId)
+            ->whereDate('created_at', now()->toDateString())
+            ->max('queue_number') + 1;
     }
 }

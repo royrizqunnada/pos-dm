@@ -322,6 +322,7 @@ class CashierScreen extends Component
                 'cashier_id' => auth()->id(),
                 'shift_id' => $this->shiftId,
                 'order_number' => Order::generateOrderNumber(),
+                'queue_number' => Order::nextQueueNumber($this->locationId),
                 'status' => 'paid',
                 'payment_method' => $this->paymentMethod,
                 'total_amount' => $net,
