@@ -26,6 +26,7 @@ class VendorPanelProvider extends PanelProvider
         return $panel
             ->id('vendor')
             ->path('vendor')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->brandName('Portal Vendor — DM Kuliner')
             ->colors([

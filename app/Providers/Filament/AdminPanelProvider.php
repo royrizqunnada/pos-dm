@@ -6,9 +6,8 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Widgets\DashboardRingkasan;
 use App\Filament\Widgets\GrafikPenjualan;
-use App\Filament\Widgets\RingkasanHariIni;
-use App\Filament\Widgets\TopVendorHariIni;
 use Filament\Enums\ThemeMode;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
@@ -30,6 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->brandName('DM Kuliner POS')
             ->defaultThemeMode(ThemeMode::Light)
@@ -43,10 +43,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                RingkasanHariIni::class,
+                DashboardRingkasan::class,
                 GrafikPenjualan::class,
-                TopVendorHariIni::class,
-                AccountWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
