@@ -54,6 +54,33 @@ class SettlementService
     }
 
     /**
+     * Agregat total (lintas vendor) untuk rentang waktu & lokasi opsional.
+     * Hanya order 'paid'. Sudah memperhitungkan diskon.
+     *
+     * @return array{order_count:int, total_base_owed:int, total_margin:int, total_gross:int}
+     */
+    public function aggregate(Carbon $from, Carbon $to, ?int $locationId = null): array
+    {
+        $row = DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.status', 'paid')
+            ->whereBetween('orders.paid_at', [$from, $to])
+            ->when($locationId, fn ($q) => $q->where('orders.location_id', $locationId))
+            ->selectRaw('COUNT(DISTINCT orders.id) as order_count')
+            ->selectRaw('COALESCE(SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base), 0) as total_base_owed')
+            ->selectRaw('COALESCE(SUM(order_items.margin_snapshot * order_items.qty - order_items.discount_from_margin), 0) as total_margin')
+            ->selectRaw('COALESCE(SUM(order_items.selling_price_snapshot * order_items.qty - order_items.discount_share), 0) as total_gross')
+            ->first();
+
+        return [
+            'order_count' => (int) ($row->order_count ?? 0),
+            'total_base_owed' => (int) ($row->total_base_owed ?? 0),
+            'total_margin' => (int) ($row->total_margin ?? 0),
+            'total_gross' => (int) ($row->total_gross ?? 0),
+        ];
+    }
+
+    /**
      * Rekap untuk satu hari penuh (00:00 - 23:59:59).
      */
     public function forDate(int $locationId, Carbon $date): Collection
