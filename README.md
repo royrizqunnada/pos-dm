@@ -1,58 +1,210 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# DM Kuliner POS — Sistem Kasir FoodCourt Multi-Vendor
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Kasir terpusat untuk foodcourt multi-vendor. Pelanggan bayar di satu kasir,
+sistem otomatis menghitung jatah tiap vendor (`harga_dasar`) dan margin owner
+(`margin`) per transaksi — tidak perlu lagi hitung manual misah-misah nota tiap sore.
 
-## About Laravel
+> **Status: Phase 1 (MVP) selesai.** Kasir bisa input pesanan multi-vendor,
+> terima pembayaran (cash/QRIS), dan owner bisa melihat rekap settlement harian
+> otomatis per vendor.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Model Harga
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Istilah        | Arti                          | Contoh    |
+|----------------|-------------------------------|-----------|
+| `harga_dasar`  | jatah vendor                  | Rp 10.000 |
+| `margin`       | jatah owner                   | Rp 2.000  |
+| `harga_jual`   | dibayar pelanggan (auto)      | Rp 12.000 |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+`harga_jual = harga_dasar + margin` (dihitung otomatis di model & form).
 
-## Learning Laravel
+## Tech Stack
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **Laravel 13** (PHP 8.3+) — `pdo_pgsql` wajib aktif
+- **PostgreSQL** (database `dmkuliner_pos`)
+- **Filament 4** — panel admin / back-office (master data, laporan settlement)
+- **Livewire 3 + Alpine.js** — layar kasir reaktif (cart live, sentuh-cepat)
+- **Tailwind CSS v4 + Vite** — styling clean-white (referensi Square/Toast/Loyverse)
+- **spatie/laravel-permission** — role `owner`, `manager`, `cashier`, `vendor`
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Pembagian: **Filament** = back-office (owner/manajer). **Livewire custom** = layar kasir.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## Setup Lokal
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Prasyarat: PHP 8.3+ (`pdo_pgsql`), Composer, Node 18+, PostgreSQL 14+.
 
 ```bash
-composer require laravel/boost --dev
+# 1. Dependencies
+composer install
+npm install
 
-php artisan boost:install
+# 2. Environment
+cp .env.example .env
+php artisan key:generate
+
+# 3. Buat database PostgreSQL (sekali saja)
+#    psql:  CREATE DATABASE dmkuliner_pos;
+#           CREATE USER dmpos WITH PASSWORD 'dmpos_secret';
+#           GRANT ALL PRIVILEGES ON DATABASE dmkuliner_pos TO dmpos;
+#    lalu sesuaikan DB_* di .env
+
+# 4. Migrasi + seed (membuat lokasi, 8 vendor, ~38 menu, akun demo)
+php artisan migrate --seed
+#    atau jika sudah migrate: php artisan import:menu
+
+# 5. Build asset + jalankan
+npm run dev          # development (hot reload)
+#    atau: npm run build   # production
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Buka:
+- **Layar kasir:** http://localhost:8000/kasir (atau `/` → login)
+- **Panel admin:** http://localhost:8000/admin
 
-## Contributing
+### Akun Demo
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Email                    | Password   | Role    | Akses                          |
+|--------------------------|------------|---------|--------------------------------|
+| owner@dmkuliner.test     | `password` | owner   | Kasir + Admin (semua)          |
+| manager@dmkuliner.test   | `password` | manager | Kasir + Admin (semua)          |
+| kasir@dmkuliner.test     | `password` | cashier | Hanya layar kasir              |
 
-## Code of Conduct
+## Import Menu (CSV)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+`php artisan import:menu` membaca `database/data/menu-dmkuliner-seed.csv`.
 
-## Security Vulnerabilities
+Kolom: `vendor_kode,vendor_nama,kategori,menu,harga_jual,harga_dasar,margin,catatan`
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Aturan parsing:
+- Baris diawali `#` diabaikan (komentar).
+- `harga_dasar` kosong tapi `margin` terisi → `harga_dasar = harga_jual - margin`.
+- Keduanya kosong → `harga_dasar = harga_jual`, `margin = 0` (diedit owner via UI).
 
-## License
+Pakai CSV lain: `php artisan import:menu /path/ke/file.csv`.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Logika Settlement
+
+Untuk tiap vendor, pada lokasi & tanggal tertentu, **hanya order `status = paid`**
+(void/refund otomatis tidak dihitung):
+
+```
+totalBaseOwed = SUM(base_price_snapshot   * qty)   // dibayar ke vendor
+totalMargin   = SUM(margin_snapshot       * qty)   // keuntungan owner
+totalGross    = SUM(selling_price_snapshot * qty)   // total uang masuk
+```
+
+⚠️ **Snapshot harga.** `order_items` menyimpan `base_price_snapshot`,
+`margin_snapshot`, `selling_price_snapshot` saat transaksi. Kalau harga menu
+diubah besok, laporan settlement kemarin **tetap akurat** (sudah ada test-nya).
+
+Lihat di admin: **Laporan → Tutup Hari / Settlement** (filter lokasi + tanggal,
+ringkasan margin harian, tabel per vendor, **Export CSV** daftar pembayaran).
+
+## Struktur Penting
+
+```
+app/
+  Console/Commands/ImportMenu.php        # artisan import:menu
+  Livewire/CashierScreen.php             # layar kasir (POS)
+  Livewire/Auth/LoginForm.php            # login
+  Services/SettlementService.php         # logika rekap settlement
+  Filament/Resources/                    # CRUD Location/Vendor/MenuItem/Order
+  Filament/Pages/TutupHari.php           # halaman settlement + export CSV
+  Models/                                # Location, Vendor, MenuItem, Order, OrderItem, Settlement
+database/
+  data/menu-dmkuliner-seed.csv           # seed menu DM Kuliner
+  migrations/                            # skema (dengan snapshot harga)
+resources/views/livewire/cashier-screen.blade.php   # UI kasir
+tests/Feature/                           # CashierSettlementTest, AdminPanelTest
+```
+
+Jalankan test: `php artisan test`
+
+## Deployment (dm.digisolve.id)
+
+App ini berdiri sendiri (codebase terpisah). Host di subdomain
+`dm.digisolve.id` dengan database PostgreSQL terpisah (`dmkuliner_pos`).
+
+### 1. Server (PHP 8.3+ dengan pdo_pgsql)
+
+```bash
+sudo apt install php8.3-fpm php8.3-pgsql php8.3-mbstring php8.3-xml \
+     php8.3-curl php8.3-zip php8.3-gd php8.3-intl php8.3-bcmath
+php -m | grep pdo_pgsql   # pastikan aktif
+```
+
+### 2. Deploy kode & build
+
+```bash
+git clone <repo> /var/www/dm-pos && cd /var/www/dm-pos
+composer install --no-dev --optimize-autoloader
+npm install && npm run build
+cp .env.example .env && php artisan key:generate
+```
+
+### 3. `.env` produksi
+
+```dotenv
+APP_NAME="DM Kuliner POS"
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://dm.digisolve.id
+
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=dmkuliner_pos
+DB_USERNAME=dmpos
+DB_PASSWORD=********
+```
+
+```bash
+php artisan migrate --force --seed   # seed sekali saja di awal
+php artisan config:cache route:cache view:cache
+chown -R www-data:www-data storage bootstrap/cache
+```
+
+### 4. Nginx virtual host
+
+```nginx
+server {
+    listen 80;
+    server_name dm.digisolve.id;
+    root /var/www/dm-pos/public;
+
+    index index.php;
+    charset utf-8;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* { deny all; }
+}
+```
+
+### 5. SSL (Let's Encrypt)
+
+```bash
+sudo certbot --nginx -d dm.digisolve.id
+```
+
+Certbot otomatis menambahkan blok `listen 443 ssl` + redirect HTTP→HTTPS.
+
+> Boleh 1 server PostgreSQL bersama app lain, **asal database-nya terpisah**
+> (`dmkuliner_pos`).
+
+## Roadmap
+
+- **Phase 2** — Kitchen ticket per vendor, toggle sold-out realtime, portal
+  vendor read-only, aturan diskon (margin/vendor/bagi dua), tutup shift &
+  rekonsiliasi cash vs QRIS.
+- **Phase 3** — Dashboard multi-lokasi, analitik (jam ramai, menu terlaris),
+  pajak PB1, mode offline, audit log.
