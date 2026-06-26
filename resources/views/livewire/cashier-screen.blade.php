@@ -159,7 +159,35 @@
 
                 <div class="mb-4 rounded-xl bg-slate-50 p-4 text-center">
                     <p class="text-sm text-gray-500">Total Tagihan</p>
-                    <p class="text-4xl font-extrabold text-gray-900">{{ $rp($this->cartTotal) }}</p>
+                    @if ($this->discountValue > 0)
+                        <p class="text-base font-medium text-gray-400 line-through">{{ $rp($this->cartTotal) }}</p>
+                        <p class="text-4xl font-extrabold text-gray-900">{{ $rp($this->netTotal) }}</p>
+                        <p class="mt-1 text-xs font-medium text-red-500">Diskon {{ $rp($this->discountValue) }}</p>
+                    @else
+                        <p class="text-4xl font-extrabold text-gray-900">{{ $rp($this->cartTotal) }}</p>
+                    @endif
+                </div>
+
+                {{-- Diskon --}}
+                <div class="mb-4">
+                    <label class="mb-1 block text-sm font-medium text-gray-700">Diskon (opsional)</label>
+                    <input type="number" wire:model.live="discountAmount" inputmode="numeric" placeholder="0" min="0"
+                        class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-right text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                    @if ($this->discountValue > 0)
+                        <div class="mt-2">
+                            <p class="mb-1 text-xs text-gray-500">Ditanggung oleh</p>
+                            <div class="grid grid-cols-3 gap-2">
+                                @foreach (['owner' => 'Margin Saya', 'vendor' => 'Vendor', 'split' => 'Bagi Dua'] as $val => $label)
+                                    <button type="button" wire:click="$set('discountBorneBy', '{{ $val }}')"
+                                        @class([
+                                            'rounded-lg border py-2 text-xs font-semibold transition',
+                                            'border-primary-600 bg-primary-50 text-primary-700' => $discountBorneBy === $val,
+                                            'border-gray-200 text-gray-600 hover:bg-gray-50' => $discountBorneBy !== $val,
+                                        ])>{{ $label }}</button>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
                 {{-- Metode --}}
@@ -243,6 +271,14 @@
                 <div class="my-4 border-t border-dashed border-gray-200"></div>
 
                 <div class="space-y-1 text-sm">
+                    @if ($order->discount_amount > 0)
+                        <div class="flex justify-between text-gray-600">
+                            <span>Subtotal</span><span>{{ $rp($order->total_amount + $order->discount_amount) }}</span>
+                        </div>
+                        <div class="flex justify-between text-red-500">
+                            <span>Diskon</span><span>− {{ $rp($order->discount_amount) }}</span>
+                        </div>
+                    @endif
                     <div class="flex justify-between font-bold text-gray-900">
                         <span>Total</span><span>{{ $rp($order->total_amount) }}</span>
                     </div>

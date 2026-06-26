@@ -18,6 +18,8 @@ class Order extends Model
         'status',
         'payment_method',
         'total_amount',
+        'discount_amount',
+        'discount_borne_by',
         'paid_amount',
         'change_amount',
         'paid_at',
@@ -26,6 +28,7 @@ class Order extends Model
 
     protected $casts = [
         'total_amount' => 'integer',
+        'discount_amount' => 'integer',
         'paid_amount' => 'integer',
         'change_amount' => 'integer',
         'paid_at' => 'datetime',

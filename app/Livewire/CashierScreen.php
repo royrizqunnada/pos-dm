@@ -36,6 +36,11 @@ class CashierScreen extends Component
 
     public ?int $cashReceived = null;
 
+    // Diskon
+    public ?int $discountAmount = null;
+
+    public string $discountBorneBy = 'owner'; // owner | vendor | split
+
     // Struk
     public bool $showReceipt = false;
 
@@ -94,9 +99,22 @@ class CashierScreen extends Component
     }
 
     #[Computed]
+    public function discountValue(): int
+    {
+        // Diskon dibatasi maksimal sebesar total belanja.
+        return max(0, min((int) $this->discountAmount, $this->cartTotal));
+    }
+
+    #[Computed]
+    public function netTotal(): int
+    {
+        return max(0, $this->cartTotal - $this->discountValue);
+    }
+
+    #[Computed]
     public function changeAmount(): int
     {
-        return max(0, (int) $this->cashReceived - $this->cartTotal);
+        return max(0, (int) $this->cashReceived - $this->netTotal);
     }
 
     public function addToCart(int $menuItemId): void
@@ -165,6 +183,8 @@ class CashierScreen extends Component
 
         $this->paymentMethod = 'cash';
         $this->cashReceived = null;
+        $this->discountAmount = null;
+        $this->discountBorneBy = 'owner';
         $this->showPayModal = true;
     }
 
@@ -175,7 +195,7 @@ class CashierScreen extends Component
 
     public function setExact(): void
     {
-        $this->cashReceived = $this->cartTotal;
+        $this->cashReceived = $this->netTotal;
     }
 
     public function pay(): void
@@ -184,11 +204,13 @@ class CashierScreen extends Component
             return;
         }
 
-        $total = $this->cartTotal;
+        $gross = $this->cartTotal;
+        $discount = $this->discountValue;
+        $net = $gross - $discount;
 
         if ($this->paymentMethod === 'cash') {
             $this->cashReceived = (int) $this->cashReceived;
-            if ($this->cashReceived < $total) {
+            if ($this->cashReceived < $net) {
                 throw ValidationException::withMessages([
                     'cashReceived' => 'Uang tunai kurang dari total.',
                 ]);
@@ -196,23 +218,39 @@ class CashierScreen extends Component
             $paid = $this->cashReceived;
         } else {
             // QRIS: dianggap dibayar pas.
-            $paid = $total;
+            $paid = $net;
         }
 
-        $order = DB::transaction(function () use ($total, $paid) {
+        // Hitung alokasi diskon ke tiap baris (snapshot).
+        $lineInputs = [];
+        foreach ($this->cart as $id => $line) {
+            $lineInputs[$id] = [
+                'selling_total' => $line['selling_price'] * $line['qty'],
+                'base_total' => $line['base_price'] * $line['qty'],
+                'margin_total' => $line['margin'] * $line['qty'],
+            ];
+        }
+        $allocations = app(\App\Services\DiscountAllocator::class)
+            ->allocate($lineInputs, $discount, $this->discountBorneBy);
+
+        $order = DB::transaction(function () use ($gross, $net, $discount, $paid, $allocations) {
             $order = Order::create([
                 'location_id' => $this->locationId,
                 'cashier_id' => auth()->id(),
                 'order_number' => Order::generateOrderNumber(),
                 'status' => 'paid',
                 'payment_method' => $this->paymentMethod,
-                'total_amount' => $total,
+                'total_amount' => $net,
+                'discount_amount' => $discount,
+                'discount_borne_by' => $discount > 0 ? $this->discountBorneBy : null,
                 'paid_amount' => $paid,
-                'change_amount' => max(0, $paid - $total),
+                'change_amount' => max(0, $paid - $net),
                 'paid_at' => now(),
             ]);
 
-            foreach ($this->cart as $line) {
+            foreach ($this->cart as $id => $line) {
+                $alloc = $allocations[$id] ?? ['share' => 0, 'from_base' => 0, 'from_margin' => 0];
+
                 $order->items()->create([
                     'menu_item_id' => $line['id'],
                     'vendor_id' => $line['vendor_id'],
@@ -224,6 +262,9 @@ class CashierScreen extends Component
                     'margin_snapshot' => $line['margin'],
                     'selling_price_snapshot' => $line['selling_price'],
                     'line_total' => $line['selling_price'] * $line['qty'],
+                    'discount_share' => $alloc['share'],
+                    'discount_from_base' => $alloc['from_base'],
+                    'discount_from_margin' => $alloc['from_margin'],
                 ]);
             }
 

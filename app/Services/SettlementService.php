@@ -33,9 +33,10 @@ class SettlementService
                 'vendors.name',
                 'vendors.payout_account',
                 DB::raw('COUNT(DISTINCT orders.id) as order_count'),
-                DB::raw('SUM(order_items.base_price_snapshot * order_items.qty) as total_base_owed'),
-                DB::raw('SUM(order_items.margin_snapshot * order_items.qty) as total_margin'),
-                DB::raw('SUM(order_items.selling_price_snapshot * order_items.qty) as total_gross'),
+                // Kurangi alokasi diskon: jatah vendor & margin owner = nilai snapshot - potongan diskon.
+                DB::raw('SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base) as total_base_owed'),
+                DB::raw('SUM(order_items.margin_snapshot * order_items.qty - order_items.discount_from_margin) as total_margin'),
+                DB::raw('SUM(order_items.selling_price_snapshot * order_items.qty - order_items.discount_share) as total_gross'),
             ])
             ->orderBy('vendors.code')
             ->get();

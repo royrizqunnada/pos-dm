@@ -20,6 +20,9 @@ class OrderItem extends Model
         'margin_snapshot',
         'selling_price_snapshot',
         'line_total',
+        'discount_share',
+        'discount_from_base',
+        'discount_from_margin',
     ];
 
     protected $casts = [
@@ -28,6 +31,9 @@ class OrderItem extends Model
         'margin_snapshot' => 'integer',
         'selling_price_snapshot' => 'integer',
         'line_total' => 'integer',
+        'discount_share' => 'integer',
+        'discount_from_base' => 'integer',
+        'discount_from_margin' => 'integer',
     ];
 
     public function order(): BelongsTo
