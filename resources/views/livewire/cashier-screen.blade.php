@@ -258,7 +258,6 @@
                 <div class="text-center">
                     <p class="text-base font-bold tracking-widest">DM KULINER</p>
                     <p class="text-[11px] text-gray-600">Jl. Lingkar Utara, Komplek Arjuna, Randudongkal</p>
-                    <p class="text-[11px] text-gray-600">0812-xxxx-xxxx</p>
                 </div>
 
                 <div class="my-2 border-t border-dashed border-gray-400"></div>
@@ -308,8 +307,7 @@
                 {{-- Footer --}}
                 <div class="text-center text-[11px] leading-snug">
                     <p>Terima kasih &amp; selamat menikmati!</p>
-                    <p>IG: {{ '@dmkuliner' }}</p>
-                    <p class="mt-1 text-gray-500">Simpan struk untuk komplain</p>
+                    <p>IG: {{ '@dmkuliner.id' }}</p>
                 </div>
 
                 <div class="mt-6 grid grid-cols-2 gap-3 print:hidden">
