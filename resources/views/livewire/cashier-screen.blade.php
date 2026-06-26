@@ -24,6 +24,14 @@
             </div>
         </div>
         <div class="flex items-center gap-3">
+            {{-- Status shift --}}
+            @if ($this->currentShift)
+                <button wire:click="promptCloseShift" class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100">
+                    <span class="h-2 w-2 rounded-full bg-green-500"></span> Tutup Shift
+                </button>
+            @else
+                <button wire:click="promptOpenShift" class="rounded-lg border border-primary-200 bg-primary-50 px-3 py-2 text-sm font-medium text-primary-700 hover:bg-primary-100">Buka Shift</button>
+            @endif
             <span class="hidden text-sm text-gray-500 sm:inline">{{ auth()->user()->name }}</span>
             @if (auth()->user()->hasAnyRole(['owner', 'manager']))
                 <a href="/admin" class="rounded-lg border border-gray-200 px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">Admin</a>
@@ -326,6 +334,70 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+        </div>
+    @endif
+
+    {{-- ===== MODAL BUKA SHIFT ===== --}}
+    @if ($showOpenShift)
+        <div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:hidden">
+            <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+                <h3 class="mb-1 text-lg font-bold text-gray-900">Buka Shift</h3>
+                <p class="mb-4 text-sm text-gray-500">Masukkan kas awal (modal laci) sebelum mulai melayani.</p>
+                <label class="mb-1 block text-sm font-medium text-gray-700">Kas Awal</label>
+                <input type="number" wire:model="openingCash" inputmode="numeric" placeholder="0" min="0"
+                    class="w-full rounded-xl border border-gray-200 px-4 py-3 text-right text-2xl font-bold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                    <button wire:click="$set('showOpenShift', false)" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Batal</button>
+                    <button wire:click="openShift" class="rounded-xl bg-primary-600 py-3 text-sm font-bold text-white hover:bg-primary-700">Buka Shift</button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    {{-- ===== MODAL TUTUP SHIFT (rekonsiliasi) ===== --}}
+    @if ($showCloseShift && $this->currentShift)
+        @php($shift = $this->currentShift)
+        @php($t = $shift->liveSalesTotals())
+        @php($expected = $shift->opening_cash + $t['cash'])
+        @php($variance = (int) $countedCash - $expected)
+        <div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:hidden">
+            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+                <h3 class="mb-1 text-lg font-bold text-gray-900">Tutup Shift &amp; Rekonsiliasi</h3>
+                <p class="mb-4 text-sm text-gray-500">Dibuka {{ $shift->opened_at->format('d/m H:i') }} · {{ $t['count'] }} transaksi</p>
+
+                <div class="space-y-2 rounded-xl bg-slate-50 p-4 text-sm">
+                    <div class="flex justify-between text-gray-600"><span>Kas Awal</span><span>{{ $rp($shift->opening_cash) }}</span></div>
+                    <div class="flex justify-between text-gray-600"><span>Penjualan Tunai</span><span>{{ $rp($t['cash']) }}</span></div>
+                    <div class="flex justify-between font-semibold text-gray-900 border-t border-gray-200 pt-2"><span>Kas Seharusnya</span><span>{{ $rp($expected) }}</span></div>
+                    <div class="flex justify-between text-gray-600"><span>Penjualan QRIS</span><span>{{ $rp($t['qris']) }}</span></div>
+                </div>
+
+                <div class="mt-4">
+                    <label class="mb-1 block text-sm font-medium text-gray-700">Kas Fisik Dihitung</label>
+                    <input type="number" wire:model.live="countedCash" inputmode="numeric" placeholder="0" min="0"
+                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-right text-2xl font-bold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                    @if ($countedCash !== null && $countedCash !== '')
+                        <div @class([
+                            'mt-3 flex items-center justify-between rounded-xl px-4 py-3',
+                            'bg-green-50 text-green-700' => $variance === 0,
+                            'bg-yellow-50 text-yellow-700' => $variance !== 0,
+                        ])>
+                            <span class="text-sm font-medium">Selisih</span>
+                            <span class="text-xl font-bold">{{ $variance > 0 ? '+' : '' }}{{ $rp($variance) }}</span>
+                        </div>
+                        @if ($variance < 0)
+                            <p class="mt-1 text-xs text-red-500">Kas kurang dari seharusnya.</p>
+                        @elseif ($variance > 0)
+                            <p class="mt-1 text-xs text-yellow-600">Kas lebih dari seharusnya.</p>
+                        @endif
+                    @endif
+                </div>
+
+                <div class="mt-5 grid grid-cols-2 gap-3">
+                    <button wire:click="$set('showCloseShift', false)" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Batal</button>
+                    <button wire:click="closeShift" class="rounded-xl bg-green-600 py-3 text-sm font-bold text-white hover:bg-green-700">Tutup Shift</button>
+                </div>
             </div>
         </div>
     @endif

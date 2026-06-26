@@ -46,6 +46,17 @@ class CashierScreen extends Component
 
     public ?int $lastOrderId = null;
 
+    // Shift
+    public ?int $shiftId = null;
+
+    public bool $showOpenShift = false;
+
+    public ?int $openingCash = null;
+
+    public bool $showCloseShift = false;
+
+    public ?int $countedCash = null;
+
     public function mount(): void
     {
         // Hanya kasir, owner, dan manager yang boleh mengoperasikan layar kasir.
@@ -55,6 +66,78 @@ class CashierScreen extends Component
         );
 
         $this->locationId = auth()->user()?->location_id ?? Location::query()->value('id');
+
+        // Muat shift yang sedang terbuka untuk kasir ini.
+        $this->shiftId = \App\Models\Shift::query()
+            ->where('cashier_id', auth()->id())
+            ->where('location_id', $this->locationId)
+            ->where('status', 'open')
+            ->latest('opened_at')
+            ->value('id');
+    }
+
+    #[Computed]
+    public function currentShift(): ?\App\Models\Shift
+    {
+        return $this->shiftId ? \App\Models\Shift::find($this->shiftId) : null;
+    }
+
+    public function promptOpenShift(): void
+    {
+        $this->openingCash = null;
+        $this->showOpenShift = true;
+    }
+
+    public function openShift(): void
+    {
+        $shift = \App\Models\Shift::create([
+            'location_id' => $this->locationId,
+            'cashier_id' => auth()->id(),
+            'opened_at' => now(),
+            'opening_cash' => max(0, (int) $this->openingCash),
+            'status' => 'open',
+        ]);
+
+        $this->shiftId = $shift->id;
+        $this->showOpenShift = false;
+    }
+
+    public function promptCloseShift(): void
+    {
+        if (! $this->currentShift) {
+            return;
+        }
+
+        $this->countedCash = null;
+        $this->showCloseShift = true;
+    }
+
+    public function closeShift(): void
+    {
+        $shift = $this->currentShift;
+
+        if (! $shift) {
+            return;
+        }
+
+        $totals = $shift->liveSalesTotals();
+        $expected = $shift->opening_cash + $totals['cash'];
+        $counted = max(0, (int) $this->countedCash);
+
+        $shift->update([
+            'closed_at' => now(),
+            'expected_cash' => $expected,
+            'counted_cash' => $counted,
+            'cash_variance' => $counted - $expected,
+            'total_cash_sales' => $totals['cash'],
+            'total_qris_sales' => $totals['qris'],
+            'order_count' => $totals['count'],
+            'status' => 'closed',
+        ]);
+
+        $this->shiftId = null;
+        $this->showCloseShift = false;
+        unset($this->currentShift);
     }
 
     #[Computed]
@@ -237,6 +320,7 @@ class CashierScreen extends Component
             $order = Order::create([
                 'location_id' => $this->locationId,
                 'cashier_id' => auth()->id(),
+                'shift_id' => $this->shiftId,
                 'order_number' => Order::generateOrderNumber(),
                 'status' => 'paid',
                 'payment_method' => $this->paymentMethod,

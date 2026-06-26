@@ -14,6 +14,7 @@ class Order extends Model
     protected $fillable = [
         'location_id',
         'cashier_id',
+        'shift_id',
         'order_number',
         'status',
         'payment_method',
@@ -43,6 +44,11 @@ class Order extends Model
     public function cashier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'cashier_id');
+    }
+
+    public function shift(): BelongsTo
+    {
+        return $this->belongsTo(Shift::class);
     }
 
     public function items(): HasMany
