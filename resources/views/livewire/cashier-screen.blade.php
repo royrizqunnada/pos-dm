@@ -4,7 +4,11 @@
     :class="printMode === 'kitchen' ? 'mode-kitchen' : 'mode-receipt'">
     <style>
         [x-cloak] { display: none !important; }
+        /* Hilangkan margin halaman => buang header/footer browser (tanggal, URL, nomor halaman). */
+        @page { margin: 0; }
         @media print {
+            /* Paksa cetak warna latar (qty/badge) bila printer mendukung. */
+            .print-layer, .print-layer * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             /* Hanya cetak lapisan aktif (struk/tiket), sembunyikan UI lain. */
             .pos-root > :not(.print-layer) { display: none !important; }
             .print-layer { position: static !important; background: #fff !important; padding: 0 !important; }
@@ -354,14 +358,14 @@
                                 <span class="font-normal text-gray-500">· {{ $order->created_at->format('H:i') }}</span>
                             </p>
                             @if ($order->table_number)
-                                <span class="rounded-md bg-gray-900 px-2 py-0.5 text-sm font-bold text-white">Meja {{ $order->table_number }}</span>
+                                <span class="rounded-md border-2 border-gray-900 px-2 py-0.5 text-sm font-extrabold text-gray-900">Meja {{ $order->table_number }}</span>
                             @endif
                         </div>
                         <div class="space-y-2">
                             @foreach ($vendorItems as $item)
                                 <div class="flex items-center gap-3 text-base">
-                                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-gray-900 text-sm font-bold text-white">{{ $item->qty }}</span>
-                                    <span class="font-medium text-gray-900">{{ $item->name_snapshot }}</span>
+                                    <span class="flex h-8 w-9 shrink-0 items-center justify-center rounded-md border-2 border-gray-900 text-base font-extrabold text-gray-900">{{ $item->qty }}</span>
+                                    <span class="font-semibold text-gray-900">{{ $item->name_snapshot }}</span>
                                 </div>
                             @endforeach
                         </div>
