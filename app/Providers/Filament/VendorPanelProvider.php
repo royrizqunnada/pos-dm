@@ -29,6 +29,8 @@ class VendorPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->brandName('Portal Vendor — DM Kuliner')
+            ->brandLogo(fn () => view('filament.brand'))
+            ->brandLogoHeight('2rem')
             ->colors([
                 'primary' => Color::Blue,
             ])

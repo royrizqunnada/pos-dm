@@ -23,6 +23,7 @@ class MenuItemsTable
                     ->collapsible(),
             ])
             ->defaultGroup('vendor.name')
+            ->striped()
             ->paginationPageOptions([25, 50, 100, 'all'])
             ->defaultPaginationPageOption(50)
             ->columns([
@@ -44,7 +45,9 @@ class MenuItemsTable
                 TextColumn::make('margin')
                     ->label('Margin')
                     ->money('IDR', 0)
-                    ->color('primary')
+                    // Margin 0 dipudarkan agar yang sudah diisi lebih menonjol.
+                    ->color(fn ($state) => $state > 0 ? 'primary' : 'gray')
+                    ->weight(fn ($state) => $state > 0 ? 'bold' : 'normal')
                     ->sortable(),
                 TextColumn::make('selling_price')
                     ->label('Harga Jual')

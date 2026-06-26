@@ -65,10 +65,11 @@
                     @foreach ($this->vendors as $vendor)
                         <button wire:click="$set('activeVendorId', {{ $vendor->id }})"
                             @class([
-                                'shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition',
+                                'inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition',
                                 'bg-primary-600 text-white' => $activeVendorId === $vendor->id,
                                 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50' => $activeVendorId !== $vendor->id,
                             ])>
+                            <span class="h-2.5 w-2.5 rounded-full" style="background-color: {{ $this->vendorColor($vendor->id) }}"></span>
                             <span class="opacity-70">{{ $vendor->code }}</span> · {{ $vendor->name }}
                         </button>
                     @endforeach
@@ -79,8 +80,10 @@
             <div class="flex-1 overflow-y-auto px-4 py-4" wire:poll.15s>
                 @php($grouped = $this->menuItems->groupBy('vendor_id'))
                 @forelse ($grouped as $vendorId => $items)
+                    @php($vColor = $this->vendorColor($items->first()->vendor->id))
                     <div class="mb-6">
                         <div class="mb-2 flex items-center gap-2">
+                            <span class="h-3 w-3 rounded-full" style="background-color: {{ $vColor }}"></span>
                             <span class="inline-flex items-center rounded-md bg-gray-100 px-2 py-0.5 text-xs font-bold text-gray-600">{{ $items->first()->vendor->code }}</span>
                             <h3 class="text-sm font-semibold text-gray-700">{{ $items->first()->vendor->name }}</h3>
                         </div>

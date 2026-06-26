@@ -142,6 +142,16 @@ class CashierScreen extends Component
         unset($this->currentShift);
     }
 
+    /**
+     * Warna aksen tetap per vendor (deterministik dari id).
+     */
+    public function vendorColor(int $vendorId): string
+    {
+        $palette = ['#2563eb', '#16a34a', '#db2777', '#ea580c', '#7c3aed', '#0891b2', '#ca8a04', '#dc2626', '#4f46e5', '#0d9488'];
+
+        return $palette[$vendorId % count($palette)];
+    }
+
     #[Computed]
     public function vendors(): Collection
     {

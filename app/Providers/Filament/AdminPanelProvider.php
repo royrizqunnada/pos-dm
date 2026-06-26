@@ -32,6 +32,8 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->brandName('DM Kuliner POS')
+            ->brandLogo(fn () => view('filament.brand'))
+            ->brandLogoHeight('2rem')
             ->defaultThemeMode(ThemeMode::Light)
             ->colors([
                 'primary' => Color::Blue,
