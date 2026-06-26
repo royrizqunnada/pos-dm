@@ -81,6 +81,28 @@ class SettlementService
     }
 
     /**
+     * Menu terlaris dalam rentang waktu (berdasarkan qty terjual), order 'paid'.
+     *
+     * @return Collection<int, object>
+     */
+    public function topMenus(Carbon $from, Carbon $to, ?int $locationId = null, int $limit = 10): Collection
+    {
+        return DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->join('vendors', 'vendors.id', '=', 'order_items.vendor_id')
+            ->where('orders.status', 'paid')
+            ->whereBetween('orders.paid_at', [$from, $to])
+            ->when($locationId, fn ($q) => $q->where('orders.location_id', $locationId))
+            ->groupBy('order_items.name_snapshot', 'vendors.code')
+            ->selectRaw('order_items.name_snapshot as name, vendors.code as vendor_code')
+            ->selectRaw('SUM(order_items.qty) as qty')
+            ->selectRaw('SUM(order_items.selling_price_snapshot * order_items.qty - order_items.discount_share) as gross')
+            ->orderByDesc('qty')
+            ->limit($limit)
+            ->get();
+    }
+
+    /**
      * Rekap untuk satu hari penuh (00:00 - 23:59:59).
      */
     public function forDate(int $locationId, Carbon $date): Collection

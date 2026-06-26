@@ -70,4 +70,45 @@ class AdminPanelTest extends TestCase
             ->get('/admin')
             ->assertForbidden();
     }
+
+    public function test_owner_can_open_users_and_period_recap(): void
+    {
+        $owner = $this->makeUser('owner');
+
+        $this->actingAs($owner)->get('/admin/users')->assertOk();
+        $this->actingAs($owner)->get('/admin/rekap-periode')->assertOk()->assertSee('Margin Saya');
+    }
+
+    public function test_manager_cannot_manage_users(): void
+    {
+        // Kelola pengguna khusus owner.
+        $this->actingAs($this->makeUser('manager'))->get('/admin/users')->assertForbidden();
+    }
+
+    public function test_owner_creates_vendor_login_with_role_synced(): void
+    {
+        $owner = $this->makeUser('owner');
+        $location = \App\Models\Location::first();
+        $vendor = \App\Models\Vendor::create([
+            'location_id' => $location->id, 'code' => 'XX', 'name' => 'X Vendor',
+        ]);
+
+        \Livewire\Livewire::actingAs($owner)
+            ->test(\App\Filament\Resources\Users\Pages\CreateUser::class)
+            ->fillForm([
+                'name' => 'Vendor X',
+                'email' => 'vx@test.dev',
+                'role' => 'vendor',
+                'vendor_id' => $vendor->id,
+                'location_id' => $location->id,
+                'password' => 'secret123',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $user = \App\Models\User::where('email', 'vx@test.dev')->firstOrFail();
+        $this->assertTrue($user->hasRole('vendor'));
+        $this->assertSame($vendor->id, $user->vendor_id);
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('secret123', $user->password));
+    }
 }
