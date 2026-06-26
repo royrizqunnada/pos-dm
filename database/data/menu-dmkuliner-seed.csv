@@ -1,0 +1,44 @@
+# DM Kuliner - Randudongkal :: seed menu multi-vendor
+# Kolom: vendor_kode,vendor_nama,kategori,menu,harga_jual,harga_dasar,margin,catatan
+# Aturan: baris diawali '#' diabaikan.
+#  - harga_dasar kosong & margin terisi  -> harga_dasar = harga_jual - margin
+#  - dua-duanya kosong                   -> harga_dasar = harga_jual, margin = 0
+vendor_kode,vendor_nama,kategori,menu,harga_jual,harga_dasar,margin,catatan
+BB,Bakso Beranak Pak Kumis,Bakso,Bakso Beranak Jumbo,20000,17000,3000,best seller
+BB,Bakso Beranak Pak Kumis,Bakso,Bakso Urat,16000,13500,2500,
+BB,Bakso Beranak Pak Kumis,Bakso,Bakso Halus,14000,12000,2000,
+BB,Bakso Beranak Pak Kumis,Mie,Mie Ayam Bakso,17000,14500,2500,
+BB,Bakso Beranak Pak Kumis,Minuman,Es Teh Manis,5000,4000,1000,
+JD,Jus & Dawet Ireng,Minuman,Dawet Ireng Original,10000,8000,2000,signature
+JD,Jus & Dawet Ireng,Minuman,Jus Alpukat,15000,12000,3000,
+JD,Jus & Dawet Ireng,Minuman,Jus Mangga,13000,,2500,harga dasar dihitung otomatis
+JD,Jus & Dawet Ireng,Minuman,Es Buah Spesial,15000,12000,3000,
+JD,Jus & Dawet Ireng,Minuman,Air Mineral,4000,,,supplier belum set harga
+MNL,Mie Nyonya Lim,Mie,Mie Ayam Jamur,16000,13500,2500,
+MNL,Mie Nyonya Lim,Mie,Mie Ayam Pangsit,18000,15000,3000,
+MNL,Mie Nyonya Lim,Mie,Yamien Manis,15000,12500,2500,
+MNL,Mie Nyonya Lim,Mie,Pangsit Goreng,10000,8000,2000,
+AG,Ayam Geprek Bu Tin,Ayam,Geprek Original,15000,12000,3000,level 1-5
+AG,Ayam Geprek Bu Tin,Ayam,Geprek Keju Mozarella,22000,18000,4000,
+AG,Ayam Geprek Bu Tin,Ayam,Geprek Sambal Matah,18000,15000,3000,
+AG,Ayam Geprek Bu Tin,Paket,Paket Geprek + Nasi + Es Teh,20000,16500,3500,
+AG,Ayam Geprek Bu Tin,Tambahan,Nasi Putih,5000,4000,1000,
+NG,Nasi Goreng Mas Bro,Nasi,Nasi Goreng Spesial,18000,15000,3000,
+NG,Nasi Goreng Mas Bro,Nasi,Nasi Goreng Seafood,22000,18500,3500,
+NG,Nasi Goreng Mas Bro,Nasi,Magelangan,18000,15000,3000,
+NG,Nasi Goreng Mas Bro,Mie,Mie Goreng Jawa,17000,14000,3000,
+NG,Nasi Goreng Mas Bro,Tambahan,Telur Ceplok,4000,3000,1000,
+SP,Seafood Penyetan Bahari,Seafood,Cumi Goreng Tepung,25000,21000,4000,
+SP,Seafood Penyetan Bahari,Seafood,Udang Saus Padang,28000,23500,4500,
+SP,Seafood Penyetan Bahari,Seafood,Lele Penyet,15000,12000,3000,
+SP,Seafood Penyetan Bahari,Seafood,Ayam Penyet,16000,13000,3000,
+SP,Seafood Penyetan Bahari,Tambahan,Tahu Tempe Penyet,8000,6000,2000,
+KK,Kopi Kekinian DM,Kopi,Kopi Susu Gula Aren,18000,14000,4000,best seller
+KK,Kopi Kekinian DM,Kopi,Americano,15000,11500,3500,
+KK,Kopi Kekinian DM,Kopi,Cappuccino,20000,16000,4000,
+KK,Kopi Kekinian DM,Non-Kopi,Cokelat Es,18000,14500,3500,
+KK,Kopi Kekinian DM,Non-Kopi,Matcha Latte,20000,16000,4000,
+MR,Martabak Bangka 88,Martabak,Martabak Manis Cokelat Keju,30000,25000,5000,
+MR,Martabak Bangka 88,Martabak,Martabak Manis Spesial,38000,32000,6000,
+MR,Martabak Bangka 88,Martabak,Martabak Telur Ayam,32000,27000,5000,
+MR,Martabak Bangka 88,Martabak,Martabak Telur Spesial,40000,34000,6000,
