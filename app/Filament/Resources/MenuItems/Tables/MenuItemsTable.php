@@ -5,8 +5,8 @@ namespace App\Filament\Resources\MenuItems\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
@@ -43,9 +43,10 @@ class MenuItemsTable
                     ->money('IDR', 0)
                     ->weight('bold')
                     ->sortable(),
-                IconColumn::make('is_available')
+                ToggleColumn::make('is_available')
                     ->label('Tersedia')
-                    ->boolean(),
+                    ->onColor('success')
+                    ->offColor('danger'),
             ])
             ->filters([
                 SelectFilter::make('vendor_id')

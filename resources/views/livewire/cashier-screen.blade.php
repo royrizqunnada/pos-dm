@@ -1,5 +1,19 @@
 @php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
-<div class="flex h-screen flex-col bg-slate-50" x-data="{ printReceipt() { window.print(); } }">
+<style>
+    @media print {
+        /* Hanya cetak lapisan aktif (struk/tiket), sembunyikan UI lain. */
+        .pos-root > :not(.print-layer) { display: none !important; }
+        .print-layer { position: static !important; background: #fff !important; padding: 0 !important; }
+        .mode-receipt .kitchen-tickets { display: none !important; }
+        .mode-kitchen .customer-receipt { display: none !important; }
+        .mode-kitchen .kitchen-tickets { display: block !important; }
+        .kitchen-ticket { page-break-after: always; }
+        .kitchen-ticket:last-child { page-break-after: auto; }
+    }
+</style>
+<div class="pos-root flex h-screen flex-col bg-slate-50"
+    x-data="{ printMode: 'receipt', doPrint(mode) { this.printMode = mode; this.$nextTick(() => window.print()); } }"
+    :class="printMode === 'kitchen' ? 'mode-kitchen' : 'mode-receipt'">
     {{-- Header --}}
     <header class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 print:hidden">
         <div class="flex items-center gap-3">
@@ -52,8 +66,8 @@
                 </div>
             </div>
 
-            {{-- Grid menu --}}
-            <div class="flex-1 overflow-y-auto px-4 py-4">
+            {{-- Grid menu (poll ringan agar menu sold-out hilang otomatis) --}}
+            <div class="flex-1 overflow-y-auto px-4 py-4" wire:poll.15s>
                 @php($grouped = $this->menuItems->groupBy('vendor_id'))
                 @forelse ($grouped as $vendorId => $items)
                     <div class="mb-6">
@@ -198,8 +212,8 @@
     {{-- ===== MODAL STRUK ===== --}}
     @if ($showReceipt && $this->lastOrder)
         @php($order = $this->lastOrder)
-        <div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:static print:bg-white print:p-0">
-            <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl print:max-w-none print:shadow-none" id="receipt">
+        <div class="print-layer fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:static print:bg-white print:p-0">
+            <div class="customer-receipt w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl print:max-w-none print:shadow-none" id="receipt">
                 <div class="text-center">
                     <div class="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 print:hidden">
                         <svg class="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
@@ -243,13 +257,39 @@
                 <p class="mt-4 text-center text-xs text-gray-400">Terima kasih 🙏</p>
 
                 <div class="mt-6 grid grid-cols-2 gap-3 print:hidden">
-                    <button @click="printReceipt" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cetak</button>
-                    <button wire:click="newOrder" class="rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white hover:bg-primary-700">Transaksi Baru</button>
+                    <button @click="doPrint('receipt')" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cetak Struk</button>
+                    <button @click="doPrint('kitchen')" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Tiket Dapur</button>
+                    <button wire:click="newOrder" class="col-span-2 rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white hover:bg-primary-700">Transaksi Baru</button>
                     @if ($order->status !== 'void')
                         <button wire:click="voidLastOrder" wire:confirm="Batalkan transaksi ini? Tidak akan dihitung di settlement."
                             class="col-span-2 rounded-xl border border-red-200 py-2 text-sm font-medium text-red-600 hover:bg-red-50">Batalkan Transaksi</button>
                     @endif
                 </div>
+            </div>
+
+            {{-- Tiket dapur per vendor (hanya tampil saat cetak mode dapur) --}}
+            <div class="kitchen-tickets hidden">
+                @foreach ($order->items->groupBy('vendor_id') as $vendorItems)
+                    <div class="kitchen-ticket mx-auto max-w-sm bg-white p-6">
+                        <div class="text-center">
+                            <p class="text-xs uppercase tracking-wide text-gray-500">Tiket Dapur</p>
+                            <h3 class="text-lg font-bold text-gray-900">{{ optional($vendorItems->first()->vendor)->name }}</h3>
+                            <p class="text-xs text-gray-500">{{ optional($vendorItems->first()->vendor)->code }}</p>
+                        </div>
+                        <div class="my-3 border-t border-dashed border-gray-300"></div>
+                        <p class="mb-2 text-sm font-semibold text-gray-900">{{ $order->order_number }}
+                            <span class="font-normal text-gray-500">· {{ $order->created_at->format('H:i') }}</span>
+                        </p>
+                        <div class="space-y-2">
+                            @foreach ($vendorItems as $item)
+                                <div class="flex items-center gap-3 text-base">
+                                    <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-gray-900 text-sm font-bold text-white">{{ $item->qty }}</span>
+                                    <span class="font-medium text-gray-900">{{ $item->name_snapshot }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     @endif
