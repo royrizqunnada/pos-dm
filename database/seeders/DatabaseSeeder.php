@@ -59,6 +59,21 @@ class DatabaseSeeder extends Seeder
         );
         $cashier->syncRoles(['cashier']);
 
+        // Akun vendor demo, terhubung ke vendor pertama (portal read-only).
+        $firstVendor = \App\Models\Vendor::query()->orderBy('code')->first();
+        if ($firstVendor) {
+            $vendorUser = User::updateOrCreate(
+                ['email' => 'vendor@dmkuliner.test'],
+                [
+                    'name' => 'Vendor '.$firstVendor->name,
+                    'password' => Hash::make('password'),
+                    'location_id' => $location?->id,
+                    'vendor_id' => $firstVendor->id,
+                ]
+            );
+            $vendorUser->syncRoles(['vendor']);
+        }
+
         $this->command->info('Akun demo:');
         $this->command->table(
             ['Email', 'Password', 'Role'],
@@ -66,6 +81,7 @@ class DatabaseSeeder extends Seeder
                 ['owner@dmkuliner.test', 'password', 'owner'],
                 ['manager@dmkuliner.test', 'password', 'manager'],
                 ['kasir@dmkuliner.test', 'password', 'cashier'],
+                ['vendor@dmkuliner.test', 'password', 'vendor'],
             ]
         );
     }

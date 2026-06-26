@@ -58,12 +58,16 @@ class User extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Siapa yang boleh masuk panel admin Filament.
-     * Kasir tidak — kasir hanya pakai layar kasir (POS).
+     * Hak akses panel Filament per-panel:
+     * - admin  → owner & manager (kasir tidak: hanya layar kasir/POS).
+     * - vendor → role vendor (portal read-only milik sendiri).
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasAnyRole(['owner', 'manager', 'vendor']);
+        return match ($panel->getId()) {
+            'vendor' => $this->hasRole('vendor') && $this->vendor_id !== null,
+            default => $this->hasAnyRole(['owner', 'manager']),
+        };
     }
 
     public function isCashier(): bool
