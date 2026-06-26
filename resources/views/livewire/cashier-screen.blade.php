@@ -176,6 +176,13 @@
                     @endif
                 </div>
 
+                {{-- Nomor meja --}}
+                <div class="mb-4">
+                    <label class="mb-1 block text-sm font-medium text-gray-700">Nomor Meja</label>
+                    <input type="text" wire:model="tableNumber" inputmode="numeric" placeholder="mis. 12"
+                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                </div>
+
                 {{-- Diskon --}}
                 <div class="mb-4">
                     <label class="mb-1 block text-sm font-medium text-gray-700">Diskon (opsional)</label>
@@ -267,7 +274,9 @@
                     <div class="flex"><span class="w-16 shrink-0">No</span><span>: {{ $order->order_number }}</span></div>
                     <div class="flex"><span class="w-16 shrink-0">Tgl</span><span>: {{ $order->created_at->format('d/m/Y  H:i') }}</span></div>
                     <div class="flex"><span class="w-16 shrink-0">Kasir</span><span>: {{ optional($order->cashier)->name ?? '-' }}</span></div>
-                    <div class="flex"><span class="w-16 shrink-0">Antrian</span><span>: <span class="font-bold">{{ $order->queue_number ?? '-' }}</span></span></div>
+                    @if ($order->table_number)
+                        <div class="flex"><span class="w-16 shrink-0">Meja</span><span>: <span class="font-bold">{{ $order->table_number }}</span></span></div>
+                    @endif
                 </div>
 
                 @if ($order->status === 'void')
@@ -331,9 +340,14 @@
                             <p class="text-xs text-gray-500">{{ optional($vendorItems->first()->vendor)->code }}</p>
                         </div>
                         <div class="my-3 border-t border-dashed border-gray-300"></div>
-                        <p class="mb-2 text-sm font-semibold text-gray-900">{{ $order->order_number }}
-                            <span class="font-normal text-gray-500">· {{ $order->created_at->format('H:i') }}</span>
-                        </p>
+                        <div class="mb-2 flex items-center justify-between">
+                            <p class="text-sm font-semibold text-gray-900">{{ $order->order_number }}
+                                <span class="font-normal text-gray-500">· {{ $order->created_at->format('H:i') }}</span>
+                            </p>
+                            @if ($order->table_number)
+                                <span class="rounded-md bg-gray-900 px-2 py-0.5 text-sm font-bold text-white">Meja {{ $order->table_number }}</span>
+                            @endif
+                        </div>
                         <div class="space-y-2">
                             @foreach ($vendorItems as $item)
                                 <div class="flex items-center gap-3 text-base">

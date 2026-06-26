@@ -16,7 +16,7 @@ class Order extends Model
         'cashier_id',
         'shift_id',
         'order_number',
-        'queue_number',
+        'table_number',
         'status',
         'payment_method',
         'total_amount',
@@ -29,7 +29,6 @@ class Order extends Model
     ];
 
     protected $casts = [
-        'queue_number' => 'integer',
         'total_amount' => 'integer',
         'discount_amount' => 'integer',
         'paid_amount' => 'integer',
@@ -71,15 +70,5 @@ class Order extends Model
         $next = $last ? ((int) substr($last, -4)) + 1 : 1;
 
         return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
-    }
-
-    /**
-     * Nomor antrian harian berikutnya untuk satu lokasi (reset tiap hari).
-     */
-    public static function nextQueueNumber(int $locationId): int
-    {
-        return (int) static::where('location_id', $locationId)
-            ->whereDate('created_at', now()->toDateString())
-            ->max('queue_number') + 1;
     }
 }

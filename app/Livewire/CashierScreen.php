@@ -36,6 +36,8 @@ class CashierScreen extends Component
 
     public ?int $cashReceived = null;
 
+    public ?string $tableNumber = null;
+
     // Diskon
     public ?int $discountAmount = null;
 
@@ -266,6 +268,7 @@ class CashierScreen extends Component
 
         $this->paymentMethod = 'cash';
         $this->cashReceived = null;
+        $this->tableNumber = null;
         $this->discountAmount = null;
         $this->discountBorneBy = 'owner';
         $this->showPayModal = true;
@@ -322,7 +325,7 @@ class CashierScreen extends Component
                 'cashier_id' => auth()->id(),
                 'shift_id' => $this->shiftId,
                 'order_number' => Order::generateOrderNumber(),
-                'queue_number' => Order::nextQueueNumber($this->locationId),
+                'table_number' => $this->tableNumber ? trim($this->tableNumber) : null,
                 'status' => 'paid',
                 'payment_method' => $this->paymentMethod,
                 'total_amount' => $net,
