@@ -1,44 +1,203 @@
-# DM Kuliner - Randudongkal :: seed menu multi-vendor
-# Kolom: vendor_kode,vendor_nama,kategori,menu,harga_jual,harga_dasar,margin,catatan
-# Aturan: baris diawali '#' diabaikan.
-#  - harga_dasar kosong & margin terisi  -> harga_dasar = harga_jual - margin
-#  - dua-duanya kosong                   -> harga_dasar = harga_jual, margin = 0
 vendor_kode,vendor_nama,kategori,menu,harga_jual,harga_dasar,margin,catatan
-BB,Bakso Beranak Pak Kumis,Bakso,Bakso Beranak Jumbo,20000,17000,3000,best seller
-BB,Bakso Beranak Pak Kumis,Bakso,Bakso Urat,16000,13500,2500,
-BB,Bakso Beranak Pak Kumis,Bakso,Bakso Halus,14000,12000,2000,
-BB,Bakso Beranak Pak Kumis,Mie,Mie Ayam Bakso,17000,14500,2500,
-BB,Bakso Beranak Pak Kumis,Minuman,Es Teh Manis,5000,4000,1000,
-JD,Jus & Dawet Ireng,Minuman,Dawet Ireng Original,10000,8000,2000,signature
-JD,Jus & Dawet Ireng,Minuman,Jus Alpukat,15000,12000,3000,
-JD,Jus & Dawet Ireng,Minuman,Jus Mangga,13000,,2500,harga dasar dihitung otomatis
-JD,Jus & Dawet Ireng,Minuman,Es Buah Spesial,15000,12000,3000,
-JD,Jus & Dawet Ireng,Minuman,Air Mineral,4000,,,supplier belum set harga
-MNL,Mie Nyonya Lim,Mie,Mie Ayam Jamur,16000,13500,2500,
-MNL,Mie Nyonya Lim,Mie,Mie Ayam Pangsit,18000,15000,3000,
-MNL,Mie Nyonya Lim,Mie,Yamien Manis,15000,12500,2500,
-MNL,Mie Nyonya Lim,Mie,Pangsit Goreng,10000,8000,2000,
-AG,Ayam Geprek Bu Tin,Ayam,Geprek Original,15000,12000,3000,level 1-5
-AG,Ayam Geprek Bu Tin,Ayam,Geprek Keju Mozarella,22000,18000,4000,
-AG,Ayam Geprek Bu Tin,Ayam,Geprek Sambal Matah,18000,15000,3000,
-AG,Ayam Geprek Bu Tin,Paket,Paket Geprek + Nasi + Es Teh,20000,16500,3500,
-AG,Ayam Geprek Bu Tin,Tambahan,Nasi Putih,5000,4000,1000,
-NG,Nasi Goreng Mas Bro,Nasi,Nasi Goreng Spesial,18000,15000,3000,
-NG,Nasi Goreng Mas Bro,Nasi,Nasi Goreng Seafood,22000,18500,3500,
-NG,Nasi Goreng Mas Bro,Nasi,Magelangan,18000,15000,3000,
-NG,Nasi Goreng Mas Bro,Mie,Mie Goreng Jawa,17000,14000,3000,
-NG,Nasi Goreng Mas Bro,Tambahan,Telur Ceplok,4000,3000,1000,
-SP,Seafood Penyetan Bahari,Seafood,Cumi Goreng Tepung,25000,21000,4000,
-SP,Seafood Penyetan Bahari,Seafood,Udang Saus Padang,28000,23500,4500,
-SP,Seafood Penyetan Bahari,Seafood,Lele Penyet,15000,12000,3000,
-SP,Seafood Penyetan Bahari,Seafood,Ayam Penyet,16000,13000,3000,
-SP,Seafood Penyetan Bahari,Tambahan,Tahu Tempe Penyet,8000,6000,2000,
-KK,Kopi Kekinian DM,Kopi,Kopi Susu Gula Aren,18000,14000,4000,best seller
-KK,Kopi Kekinian DM,Kopi,Americano,15000,11500,3500,
-KK,Kopi Kekinian DM,Kopi,Cappuccino,20000,16000,4000,
-KK,Kopi Kekinian DM,Non-Kopi,Cokelat Es,18000,14500,3500,
-KK,Kopi Kekinian DM,Non-Kopi,Matcha Latte,20000,16000,4000,
-MR,Martabak Bangka 88,Martabak,Martabak Manis Cokelat Keju,30000,25000,5000,
-MR,Martabak Bangka 88,Martabak,Martabak Manis Spesial,38000,32000,6000,
-MR,Martabak Bangka 88,Martabak,Martabak Telur Ayam,32000,27000,5000,
-MR,Martabak Bangka 88,Martabak,Martabak Telur Spesial,40000,34000,6000,
+# CATATAN PENTING:
+# 1) harga_jual = hasil baca dari foto menu -> WAJIB diverifikasi sebelum dipakai.
+# 2) harga_dasar = jatah vendor (isi sendiri). margin = harga_jual - harga_dasar.
+#    Cukup isi SALAH SATU (harga_dasar ATAU margin), sisanya dihitung sistem.
+# 3) Tini Jus (TJ) confidence rendah (foto miring/list panjang) -> cek ekstra teliti.
+BB,Banyu Bening,Paket + Nasi,Paket Gurameh Bakar,36000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Gurameh Goreng,36000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Gurameh Asam Manis,38000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Bawal Bakar,22000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Bawal Goreng,22000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Pecak Belut Sambal,30000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Pecak Belut Santan,35000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Sayur Asem Pecak Panggang,19000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Sayur Asem Pecak Pindang Tongkol,19000,,,
+BB,Banyu Bening,Paket + Nasi,Paket Sayur Asem Pecak Belut,35000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Gurameh Bakar Jumbo,60000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Gurameh Asam Manis Jumbo,60000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Gurameh Goreng Jumbo,55000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Gurameh Bakar,34000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Gurameh Goreng,34000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Gurameh Asam Manis,36000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Bawal Bakar,20000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Bawal Goreng,20000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Pecak Belut Sambal,28000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Pecak Belut Santan,33000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Sayur Asem Pecak Panggang,17000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Sayur Asem Pecak Pindang Tongkol,17000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Sayur Asem Pecak Belut,33000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Pecak Terong Santan Pati,12000,,,
+BB,Banyu Bening,Terpisah + Pelengkap,Jukut Goreng (Selada Air) + Sambal,8000,,,
+BB,Banyu Bening,Pelengkap,Extra Sambal Mentah,4000,,,
+BB,Banyu Bening,Pelengkap,Extra Sambal Tomat,4000,,,
+BB,Banyu Bening,Pelengkap,Extra Sayur Asem,6000,,,
+BB,Banyu Bening,Pelengkap,Extra Nasi BB,5000,,,
+BB,Banyu Bening,Sate Taichan,Sate Taichan Original (Nasi/Lontong),19000,,,
+BB,Banyu Bening,Sate Taichan,Sate Taichan Crispy (Nasi/Lontong),22000,,,
+JD,Juragan Dimsum,Mie Jebew (Level 1-5),Toping Bakso,11000,,,
+JD,Juragan Dimsum,Mie Jebew (Level 1-5),Toping Sosis Kecil,11000,,,
+JD,Juragan Dimsum,Mie Jebew (Level 1-5),Toping Bakso Wonton,11000,,,
+JD,Juragan Dimsum,Mie Jebew (Level 1-5),Toping Wonton,13000,,,
+JD,Juragan Dimsum,Mie Jebew (Level 1-5),Toping Sosis Jumbo,13000,,,
+JD,Juragan Dimsum,Mie Jontor,Mie Jontor,14000,,,
+JD,Juragan Dimsum,Mie Jontor,Wonton Chili Oil,12000,,,
+JD,Juragan Dimsum,Mie Jontor,Wonton Kuah,12000,,,
+JD,Juragan Dimsum,Mie Jontor,Tempura Chili Oil,12000,,,
+JD,Juragan Dimsum,Dimsum,Original isi 3,12000,,,
+JD,Juragan Dimsum,Dimsum,Original isi 4,14000,,,
+JD,Juragan Dimsum,Dimsum,Original isi 5,17000,,,
+JD,Juragan Dimsum,Dimsum,Mentai isi 3,15000,,,
+JD,Juragan Dimsum,Dimsum,Mentai isi 4,18000,,,
+JD,Juragan Dimsum,Dimsum,Mentai isi 5,22000,,,
+JD,Juragan Dimsum,Dimsum,Bolognese isi 3,15000,,,
+JD,Juragan Dimsum,Dimsum,Bolognese isi 4,18000,,,
+JD,Juragan Dimsum,Dimsum,Bolognese isi 5,22000,,,
+JD,Juragan Dimsum,Dimsum,Mentai Keju isi 3,16000,,,
+JD,Juragan Dimsum,Dimsum,Mentai Keju isi 4,20000,,,
+JD,Juragan Dimsum,Dimsum,Mentai Keju isi 5,25000,,,
+JD,Juragan Dimsum,Dimsum,Hotspicy isi 3,15000,,,
+JD,Juragan Dimsum,Dimsum,Hotspicy isi 4,18000,,,
+JD,Juragan Dimsum,Dimsum,Hotspicy isi 5,22000,,,
+JD,Juragan Dimsum,Dimsum,Dimsum Goreng Keju Original,18000,,,
+JD,Juragan Dimsum,Dimsum,Dimsum Goreng Keju Mentai,24000,,,
+JD,Juragan Dimsum,Dimsum,Lumpia Udang,13000,,,
+JD,Juragan Dimsum,Dimsum,Udang Keju,13000,,,
+JD,Juragan Dimsum,Dimsum,Udang Rambutan,13000,,,
+JD,Juragan Dimsum,Dimsum,Crispy Mini Wonton,13000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Black Coffee Hot,5000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Black Coffee Ice,5000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Kopi Susu Gula Aren Hot,8000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Kopi Susu Gula Aren Ice,8000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Choco Caramelo,8000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Crunchy Choco Crumb,8000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Vanila Latte,8000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Matcha Signature,8000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Silky Taro,8000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Butterscotch Coffee Latte,10000,,,
+BNC,Be Nice Coffee,Coffee Hot & Ice,Salted Caramel Latte,10000,,,
+BNC,Be Nice Coffee,Minuman Lain,Teh Tawar,2000,,,
+BNC,Be Nice Coffee,Minuman Lain,Teh Manis,3000,,,
+BNC,Be Nice Coffee,Minuman Lain,Es Teh Manis,4000,,,
+BNC,Be Nice Coffee,Minuman Lain,Jeruk Anget,7000,,,
+BNC,Be Nice Coffee,Minuman Lain,Es Jeruk,8000,,,
+MT,Moro Tresno,Menu Kambing,Sate Kambing Kronyos / Tusuk,4000,,,
+MT,Moro Tresno,Menu Kambing,Gulai Kambing Tanpa Nasi,18000,,,
+MT,Moro Tresno,Menu Kambing,Sop Kambing Tanpa Nasi,15000,,,
+MT,Moro Tresno,Menu Kambing,Extra Nasi Moro Tresno,5000,,,
+TJ,Tini Jus,Jus,Jus Mangga,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Melon,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Semangka,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Sirsak,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Strawberry,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Alpukat,12000,,,cek harga
+TJ,Tini Jus,Jus,Jus Apel,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Naga,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Nanas,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Nano Nano,13000,,,cek harga
+TJ,Tini Jus,Jus,Jus Durian,18000,,,cek harga
+TJ,Tini Jus,Jus,Jus Jambu,11000,,,cek harga
+TJ,Tini Jus,Jus,Jus Jeruk,11000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Alpukat Kocok,12000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Es Teler,17000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Soda Gembira,18000,,,cek harga
+TJ,Tini Jus,Es & Spesial,All Smoothies,15000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Alpukat Kocok Toping,21000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Durian Kocok,21000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Es Teler Durian,21000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Es Cendol Durian,26000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Es Kuwut,17000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Sop Buah,18000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Sop Buah Kuah Jus,26000,,,cek harga
+TJ,Tini Jus,Es & Spesial,Sop Durian,26000,,,cek harga
+TJ,Tini Jus,Smoothies,Smoothies Durian,25000,,,cek harga
+TJ,Tini Jus,Smoothies,Smoothies Alpukat,18000,,,cek harga
+TJ,Tini Jus,Smoothies,Smoothies Mangga,18000,,,cek harga
+TJ,Tini Jus,Smoothies,Smoothies Naga,18000,,,cek harga
+TJ,Tini Jus,Smoothies,Smoothies Strawberry,18000,,,cek harga
+MNL,Mba Minul,Bebek & Ayam,Nasi Bebek Bumbu Hitam,35000,,,
+MNL,Mba Minul,Bebek & Ayam,Nasi Goreng Telor + Sosis,20000,,,
+MNL,Mba Minul,Bebek & Ayam,Nila Tanpa Nasi,24000,,,
+MNL,Mba Minul,Bebek & Ayam,Pecel Lele,21000,,,
+MNL,Mba Minul,Bebek & Ayam,Tempong Ayam Kampung TN,27000,,,
+MNL,Mba Minul,Bebek & Ayam,Tempong Ayam Negeri TN,18000,,,
+MNL,Mba Minul,Bebek & Ayam,Ayam Kampung Tanpa Nasi,26000,,,
+MNL,Mba Minul,Bebek & Ayam,Ayam Lengkuas Negeri Tanpa Nasi,16000,,,
+MNL,Mba Minul,Bebek & Ayam,Ayam Penyet Tanpa Nasi,15000,,,
+MNL,Mba Minul,Bebek & Ayam,Bebek Hitam Tanpa Nasi,33000,,,
+MNL,Mba Minul,Bebek & Ayam,Sambel Minul,4000,,,
+MNL,Mba Minul,Nasi,Nasi Goreng Telur,19000,,,
+MNL,Mba Minul,Nasi,Nasi Tempong Ayam Kampung,29000,,,
+MNL,Mba Minul,Nasi,Nasi Tempong Ayam Negeri,20000,,,
+MNL,Mba Minul,Nasi,Nasi Tempong Ikan Nila,26000,,,
+MNL,Mba Minul,Ayam,Ayam Kampung Bakar,28000,,,
+MNL,Mba Minul,Ayam,Ayam Kampung Goreng Keraton,28000,,,
+MNL,Mba Minul,Ayam,Ayam Kampung Goreng Kremes,28000,,,
+MNL,Mba Minul,Pelengkap,Cah Kangkung,7000,,,
+MNL,Mba Minul,Pelengkap,Mendoan,6000,,,
+MNL,Mba Minul,Nasi,Nasi Ayam Penyet,17000,,,
+MNL,Mba Minul,Nasi,Nasi Daun Jeruk Ayam Kampung,28000,,,
+MNL,Mba Minul,Nasi,Nasi Daun Jeruk Ayam Negeri,18000,,,
+MNL,Mba Minul,Nasi Goreng,Nasi Goreng Biasa,16000,,,
+MNL,Mba Minul,Nasi Goreng,Nasi Goreng Sosis,19000,,,
+MNL,Mba Minul,Nasi Goreng,Nasi Goreng Pete,19000,,,
+MNL,Mba Minul,Nasi Goreng,Nasi Goreng Telur,19000,,,
+MNL,Mba Minul,Ayam,Ayam Penyet Sambel Hijau,17000,,,
+MNL,Mba Minul,Pelengkap,Pecak Sambel Terong,8000,,,
+KK,Kepiting Kompromi,Seafood,Kerang Dara,20000,,,
+KK,Kepiting Kompromi,Seafood,Cumi,29000,,,
+KK,Kepiting Kompromi,Seafood,Kerang Tahu,15000,,,
+KK,Kepiting Kompromi,Seafood,Kerang Mix,34000,,,
+KK,Kepiting Kompromi,Seafood,Gurita,29000,,,
+KK,Kepiting Kompromi,Seafood,Kerang Simping,20000,,,
+KK,Kepiting Kompromi,Seafood,Kerang Hijau,15000,,,
+KK,Kepiting Kompromi,Seafood,Cumi Goreng Tepung,29000,,,
+KK,Kepiting Kompromi,Seafood,Udang,29000,,,
+KK,Kepiting Kompromi,Seafood,Udang Goreng Tepung,29000,,,cek harga
+KK,Kepiting Kompromi,Seafood,Kepiting Only 1,24000,,,
+KK,Kepiting Kompromi,Seafood,Kepiting Only 2,34000,,,
+KK,Kepiting Kompromi,Paket,Kompromi 1,57000,,,
+KK,Kepiting Kompromi,Paket,Kompromi 2,80000,,,
+KK,Kepiting Kompromi,Paket,Kompromi 3,118000,,,
+KK,Kepiting Kompromi,Paket,Kompromi 4,170000,,,
+KK,Kepiting Kompromi,Paket,Paket Kompromi Spesial Titanic,98000,,,
+AG,Ari Gondrong,Bakso,Bakso Urat,14000,,,
+AG,Ari Gondrong,Bakso,Bakso Telor,14000,,,
+AG,Ari Gondrong,Bakso,Bakso Biasa,11000,,,
+AG,Ari Gondrong,Bakso,Bakso Mercon (PO),36000,,,
+AG,Ari Gondrong,Mie Ayam,Mie Ayam Biasa,13000,,,
+AG,Ari Gondrong,Mie Ayam,Mie Ayam Tulang,13000,,,
+AG,Ari Gondrong,Mie Ayam,Mie Ayam Ceker,17000,,,
+AG,Ari Gondrong,Mie Ayam,Mie Ayam Bakso Biasa,22000,,,
+AG,Ari Gondrong,Mie Ayam,Mie Ayam Bakso Urat Besar,19000,,,
+AG,Ari Gondrong,Mie Ayam,Mie Ayam Bakso Biasa + Ceker,23000,,,
+AG,Ari Gondrong,Mie Ayam,Mie Ayam Bakso Urat + Ceker,,,,cek harga (tdk terbaca)
+GZ,Gen-Z Angkringan,Snack Gurih,Jamur Enoki Crispy,12000,,,
+GZ,Gen-Z Angkringan,Snack Gurih,Cireng Ayam,10000,,,cek harga
+GZ,Gen-Z Angkringan,Snack Gurih,Kentang Goreng,10000,,,
+GZ,Gen-Z Angkringan,Snack Gurih,Nugget,10000,,,
+GZ,Gen-Z Angkringan,Snack Gurih,Mix Platter (Sosis+Kentang+Nugget),15000,,,
+GZ,Gen-Z Angkringan,Snack Manis,Roti Bakar Coklat,13000,,,
+GZ,Gen-Z Angkringan,Snack Manis,Roti Bakar Keju,14000,,,
+GZ,Gen-Z Angkringan,Snack Manis,Roti Bakar Coklat Keju,15000,,,
+GZ,Gen-Z Angkringan,Snack Manis,Roti Maryam Coklat,12000,,,cek harga
+GZ,Gen-Z Angkringan,Snack Manis,Roti Maryam Keju,13000,,,cek harga
+GZ,Gen-Z Angkringan,Snack Manis,Roti Maryam Coklat Keju,14000,,,cek harga
+GZ,Gen-Z Angkringan,Snack Manis,Pisang Crispy Coklat,12000,,,
+GZ,Gen-Z Angkringan,Snack Manis,Pisang Crispy Keju,13000,,,
+GZ,Gen-Z Angkringan,Snack Manis,Pisang Crispy Coklat Keju,14000,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Sosis Jumbo,5000,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Sosis Kecil,3500,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Bakso,3000,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Dumpling Keju (isi 2),5000,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Otak-Otak,3500,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Odeng,3000,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Fisroll,3500,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Tofu,3500,,,
+GZ,Gen-Z Angkringan,Bakaran Seafood (per tusuk),Tempura isi 2,3000,,,
+GZ,Gen-Z Angkringan,Seblak,Seblak Biasa,10000,,,
+GZ,Gen-Z Angkringan,Seblak,Seblak Ceker,12000,,,
+GZ,Gen-Z Angkringan,Seblak,Seblak Enoki,14000,,,
+GZ,Gen-Z Angkringan,Seblak,Seblak Seafood,14000,,,
+GZ,Gen-Z Angkringan,Seblak,Seblak Balungan,15000,,,
+GZ,Gen-Z Angkringan,Seblak,Seblak Komplit,20000,,,

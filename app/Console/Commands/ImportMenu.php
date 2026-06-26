@@ -87,6 +87,8 @@ class ImportMenu extends Command
                     margin: $this->toNumber($data['margin'] ?? null),
                 );
 
+                $sellingPrice = $basePrice + $margin;
+
                 $item = MenuItem::updateOrCreate(
                     ['vendor_id' => $vendor->id, 'name' => $menuName],
                     [
@@ -94,7 +96,9 @@ class ImportMenu extends Command
                         'base_price' => $basePrice,
                         'margin' => $margin,
                         // selling_price di-set otomatis oleh model.
-                        'is_available' => true,
+                        // Menu tanpa harga (harga_jual kosong/0) dinonaktifkan
+                        // agar tidak muncul di kasir sampai owner isi harganya.
+                        'is_available' => $sellingPrice > 0,
                         'note' => trim((string) ($data['catatan'] ?? '')) ?: null,
                     ]
                 );
