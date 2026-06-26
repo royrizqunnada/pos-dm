@@ -1,19 +1,19 @@
 @php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
-<style>
-    @media print {
-        /* Hanya cetak lapisan aktif (struk/tiket), sembunyikan UI lain. */
-        .pos-root > :not(.print-layer) { display: none !important; }
-        .print-layer { position: static !important; background: #fff !important; padding: 0 !important; }
-        .mode-receipt .kitchen-tickets { display: none !important; }
-        .mode-kitchen .customer-receipt { display: none !important; }
-        .mode-kitchen .kitchen-tickets { display: block !important; }
-        .kitchen-ticket { page-break-after: always; }
-        .kitchen-ticket:last-child { page-break-after: auto; }
-    }
-</style>
 <div class="pos-root flex h-screen flex-col bg-slate-50"
     x-data="{ printMode: 'receipt', doPrint(mode) { this.printMode = mode; this.$nextTick(() => window.print()); } }"
     :class="printMode === 'kitchen' ? 'mode-kitchen' : 'mode-receipt'">
+    <style>
+        @media print {
+            /* Hanya cetak lapisan aktif (struk/tiket), sembunyikan UI lain. */
+            .pos-root > :not(.print-layer) { display: none !important; }
+            .print-layer { position: static !important; background: #fff !important; padding: 0 !important; }
+            .mode-receipt .kitchen-tickets { display: none !important; }
+            .mode-kitchen .customer-receipt { display: none !important; }
+            .mode-kitchen .kitchen-tickets { display: block !important; }
+            .kitchen-ticket { page-break-after: always; }
+            .kitchen-ticket:last-child { page-break-after: auto; }
+        }
+    </style>
     {{-- Header --}}
     <header class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 print:hidden">
         <div class="flex items-center gap-3">
