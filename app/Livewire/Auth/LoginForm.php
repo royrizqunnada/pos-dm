@@ -31,9 +31,13 @@ class LoginForm extends Component
 
         request()->session()->regenerate();
 
-        // Kasir langsung ke layar kasir; owner/manager juga default ke kasir
-        // (mereka bisa pindah ke /admin dari header).
-        return redirect()->intended(route('kasir'));
+        // Arahkan sesuai role:
+        // - vendor          -> portal vendor (/vendor)
+        // - lainnya (kasir/owner/manager) -> layar kasir
+        $user = Auth::user();
+        $home = $user->hasRole('vendor') ? '/vendor' : route('kasir');
+
+        return redirect()->intended($home);
     }
 
     public function render()

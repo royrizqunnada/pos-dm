@@ -9,6 +9,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 
 class MenuItemsTable
@@ -16,7 +17,14 @@ class MenuItemsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->groups([
+                Group::make('vendor.name')
+                    ->label('Vendor')
+                    ->collapsible(),
+            ])
             ->defaultGroup('vendor.name')
+            ->paginationPageOptions([25, 50, 100, 'all'])
+            ->defaultPaginationPageOption(50)
             ->columns([
                 TextColumn::make('vendor.name')
                     ->label('Vendor')

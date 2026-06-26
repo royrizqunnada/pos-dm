@@ -52,7 +52,6 @@ class VendorPortalTest extends TestCase
         $this->actingAs($this->vendorUser)->get('/vendor')->assertOk();
         $this->actingAs($this->vendorUser)->get('/admin')->assertForbidden();
     }
-
     public function test_vendor_menu_list_is_scoped_to_own_vendor(): void
     {
         $this->actingAs($this->vendorUser)

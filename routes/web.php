@@ -6,7 +6,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('kasir') : redirect()->route('login');
+    if (! Auth::check()) {
+        return redirect()->route('login');
+    }
+
+    return Auth::user()->hasRole('vendor')
+        ? redirect('/vendor')
+        : redirect()->route('kasir');
 });
 
 // Auth

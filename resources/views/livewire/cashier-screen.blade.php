@@ -87,7 +87,18 @@
                         <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
                             @foreach ($items as $item)
                                 <button wire:click="addToCart({{ $item->id }})" wire:key="menu-{{ $item->id }}"
-                                    class="group flex min-h-[88px] flex-col justify-between rounded-xl border border-gray-200 bg-white p-3 text-left transition hover:border-primary-300 hover:shadow-sm active:scale-[0.98]">
+                                    x-data="{ pop: false }"
+                                    @click="pop = true; clearTimeout($el._t); $el._t = setTimeout(() => pop = false, 600)"
+                                    :class="pop ? 'border-primary-500 ring-2 ring-primary-200 scale-[0.97]' : 'border-gray-200'"
+                                    class="group relative flex min-h-[88px] flex-col justify-between rounded-xl border bg-white p-3 text-left transition duration-150 hover:border-primary-300 hover:shadow-sm active:scale-[0.96]">
+                                    <span x-show="pop" x-cloak
+                                        x-transition:enter="transition ease-out duration-150"
+                                        x-transition:enter-start="opacity-0 translate-y-1 scale-75"
+                                        x-transition:enter-end="opacity-100 -translate-y-1 scale-100"
+                                        x-transition:leave="transition ease-in duration-300"
+                                        x-transition:leave-start="opacity-100"
+                                        x-transition:leave-end="opacity-0 -translate-y-4"
+                                        class="pointer-events-none absolute -top-2 right-2 z-10 rounded-full bg-primary-600 px-2 py-0.5 text-xs font-bold text-white shadow-md">+1</span>
                                     <span class="line-clamp-2 text-sm font-medium text-gray-900">{{ $item->name }}</span>
                                     <span class="mt-2 text-base font-bold text-gray-900">{{ $rp($item->selling_price) }}</span>
                                 </button>
