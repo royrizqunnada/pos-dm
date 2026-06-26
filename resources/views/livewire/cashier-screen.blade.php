@@ -346,29 +346,45 @@
             {{-- Tiket dapur per vendor (hanya tampil saat cetak mode dapur) --}}
             <div class="kitchen-tickets hidden">
                 @foreach ($order->items->groupBy('vendor_id') as $vendorItems)
-                    <div class="kitchen-ticket mx-auto max-w-sm bg-white p-6">
-                        <div class="text-center">
-                            <p class="text-xs uppercase tracking-wide text-gray-500">Tiket Dapur</p>
-                            <h3 class="text-lg font-bold text-gray-900">{{ optional($vendorItems->first()->vendor)->name }}</h3>
-                            <p class="text-xs text-gray-500">{{ optional($vendorItems->first()->vendor)->code }}</p>
+                    @php($vendor = $vendorItems->first()->vendor)
+                    <div class="kitchen-ticket mx-auto max-w-sm bg-white p-5 font-mono text-gray-900">
+                        {{-- Header terbingkai --}}
+                        <div class="border-2 border-gray-900 px-3 py-2 text-center">
+                            <p class="text-[11px] font-bold uppercase tracking-[0.25em]">Tiket Dapur</p>
+                            <p class="text-2xl font-extrabold uppercase leading-tight">{{ optional($vendor)->name }}</p>
+                            <p class="text-xs font-semibold">{{ optional($vendor)->code }}</p>
                         </div>
-                        <div class="my-3 border-t border-dashed border-gray-300"></div>
-                        <div class="mb-2 flex items-center justify-between">
-                            <p class="text-sm font-semibold text-gray-900">{{ $order->order_number }}
-                                <span class="font-normal text-gray-500">· {{ $order->created_at->format('H:i') }}</span>
-                            </p>
+
+                        {{-- Order + meja --}}
+                        <div class="mt-3 flex items-stretch justify-between gap-3">
+                            <div class="min-w-0">
+                                <p class="text-[10px] uppercase tracking-wide text-gray-500">No. Order</p>
+                                <p class="truncate text-sm font-bold">{{ $order->order_number }}</p>
+                                <p class="text-xs text-gray-600">{{ $order->created_at->format('d/m/Y · H:i') }}</p>
+                            </div>
                             @if ($order->table_number)
-                                <span class="rounded-md border-2 border-gray-900 px-2 py-0.5 text-sm font-extrabold text-gray-900">Meja {{ $order->table_number }}</span>
+                                <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1">
+                                    <span class="text-[10px] font-bold uppercase leading-none">Meja</span>
+                                    <span class="text-3xl font-extrabold leading-none">{{ $order->table_number }}</span>
+                                </div>
                             @endif
                         </div>
-                        <div class="space-y-2">
+
+                        <div class="my-3 border-t-2 border-dashed border-gray-400"></div>
+
+                        {{-- Item besar & jelas --}}
+                        <div class="space-y-2.5">
                             @foreach ($vendorItems as $item)
-                                <div class="flex items-center gap-3 text-base">
-                                    <span class="flex h-8 w-9 shrink-0 items-center justify-center rounded-md border-2 border-gray-900 text-base font-extrabold text-gray-900">{{ $item->qty }}</span>
-                                    <span class="font-semibold text-gray-900">{{ $item->name_snapshot }}</span>
+                                <div class="flex items-start gap-3">
+                                    <span class="flex h-9 w-12 shrink-0 items-center justify-center rounded border-2 border-gray-900 text-lg font-extrabold">{{ $item->qty }}×</span>
+                                    <span class="pt-1 text-lg font-bold uppercase leading-tight">{{ $item->name_snapshot }}</span>
                                 </div>
                             @endforeach
                         </div>
+
+                        <div class="my-3 border-t-2 border-dashed border-gray-400"></div>
+
+                        <p class="text-center text-xs font-semibold text-gray-600">Total {{ $vendorItems->sum('qty') }} porsi</p>
                     </div>
                 @endforeach
             </div>
