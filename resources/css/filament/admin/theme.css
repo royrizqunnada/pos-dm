@@ -19,3 +19,37 @@
 .dark .fi-topbar > nav {
     border-bottom-color: rgba(255, 255, 255, 0.1);
 }
+
+/* ===== Sentuhan profesional ===== */
+/* Section & tabel sedikit terangkat (bukan border polos). */
+.fi-section,
+.fi-ta {
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.05);
+}
+
+.dark .fi-section,
+.dark .fi-ta {
+    box-shadow: none;
+}
+
+/* Item navigasi aktif: aksen kiri biar jelas. */
+.fi-sidebar-item-active > .fi-sidebar-item-button {
+    position: relative;
+}
+
+.fi-sidebar-item-active > .fi-sidebar-item-button::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 1.25rem;
+    width: 3px;
+    border-radius: 9999px;
+    background: var(--primary-600, #2563eb);
+}
+
+/* Header tabel sedikit lebih kalem. */
+.fi-ta-header-cell {
+    letter-spacing: 0.01em;
+}

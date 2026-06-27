@@ -9,7 +9,9 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Enums\ThemeMode;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
 use Filament\Widgets\AccountWidget;
 use Filament\Widgets\FilamentInfoWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -31,8 +33,12 @@ class VendorPanelProvider extends PanelProvider
             ->brandName('Portal Vendor — DM Kuliner')
             ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2rem')
+            ->defaultThemeMode(ThemeMode::Light)
+            ->maxContentWidth(Width::ScreenTwoExtraLarge)
+            ->sidebarCollapsibleOnDesktop()
             ->colors([
                 'primary' => Color::Blue,
+                'gray' => Color::Slate,
             ])
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\Filament\Vendor\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\Filament\Vendor\Pages')
