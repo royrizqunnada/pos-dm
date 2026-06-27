@@ -268,6 +268,7 @@
     {{-- ===== MODAL STRUK ===== --}}
     @if ($showReceipt && $this->lastOrder)
         @php($order = $this->lastOrder)
+        @php($loc = $order->location)
         <div class="print-layer fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:static print:bg-white print:p-0">
             <div class="customer-receipt w-full max-w-[20rem] rounded-2xl bg-white p-6 font-mono text-[13px] leading-tight text-gray-900 shadow-xl print:max-w-none print:rounded-none print:p-2 print:shadow-none" id="receipt">
                 <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 print:hidden">
@@ -276,8 +277,13 @@
 
                 {{-- Header --}}
                 <div class="text-center">
-                    <p class="text-base font-bold tracking-widest">DM KULINER</p>
-                    <p class="text-[11px] text-gray-600">Jl. Lingkar Utara, Komplek Arjuna, Randudongkal</p>
+                    <p class="text-base font-bold tracking-widest">{{ strtoupper($loc?->receipt_name ?: 'DM Kuliner') }}</p>
+                    @if ($loc?->address)
+                        <p class="text-[11px] text-gray-600">{{ $loc->address }}</p>
+                    @endif
+                    @if ($loc?->phone)
+                        <p class="text-[11px] text-gray-600">{{ $loc->phone }}</p>
+                    @endif
                 </div>
 
                 <div class="my-2 border-t border-dashed border-gray-400"></div>
@@ -328,8 +334,10 @@
 
                 {{-- Footer --}}
                 <div class="text-center text-[11px] leading-snug">
-                    <p>Terima kasih &amp; selamat menikmati!</p>
-                    <p>IG: {{ '@dmkuliner.id' }}</p>
+                    <p>{{ $loc?->receipt_footer ?: 'Terima kasih & selamat menikmati!' }}</p>
+                    @if ($loc?->instagram)
+                        <p>IG: {{ $loc->instagram }}</p>
+                    @endif
                 </div>
 
                 <div class="mt-6 grid grid-cols-2 gap-3 print:hidden">

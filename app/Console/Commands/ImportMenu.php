@@ -28,7 +28,11 @@ class ImportMenu extends Command
 
         $location = Location::firstOrCreate(
             ['name' => $this->option('location')],
-            ['address' => 'Randudongkal, Pemalang']
+            [
+                'receipt_name' => 'DM KULINER',
+                'address' => 'Jl. Lingkar Utara, Komplek Arjuna, Randudongkal',
+                'instagram' => '@dmkuliner.id',
+            ]
         );
         $this->info("Lokasi: {$location->name} (#{$location->id})");
 

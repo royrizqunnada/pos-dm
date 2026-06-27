@@ -12,7 +12,11 @@ class Location extends Model
 
     protected $fillable = [
         'name',
+        'receipt_name',
         'address',
+        'phone',
+        'instagram',
+        'receipt_footer',
         'is_active',
     ];
 
