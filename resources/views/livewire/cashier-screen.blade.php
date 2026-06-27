@@ -1,6 +1,6 @@
 @php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <div class="pos-root flex h-screen flex-col bg-slate-50"
-    x-data="{ printMode: 'receipt', doPrint(mode) { this.printMode = mode; this.$nextTick(() => window.print()); } }"
+    x-data="{ cartOpen: false, printMode: 'receipt', doPrint(mode) { this.printMode = mode; this.$nextTick(() => window.print()); } }"
     :class="printMode === 'kitchen' ? 'mode-kitchen' : 'mode-receipt'">
     <style>
         [x-cloak] { display: none !important; }
@@ -20,15 +20,15 @@
         }
     </style>
     {{-- Header --}}
-    <header class="flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3 print:hidden">
-        <div class="flex items-center gap-3">
-            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-[#7B1E22] text-sm font-bold text-white">DM</div>
-            <div>
-                <p class="text-sm font-semibold text-gray-900 leading-tight">DM Kuliner POS</p>
-                <p class="text-xs text-gray-500 leading-tight">{{ optional(\App\Models\Location::find($locationId))->name ?? 'Kasir' }}</p>
+    <header class="flex items-center justify-between gap-2 border-b border-gray-200 bg-white px-3 py-3 sm:px-4 print:hidden">
+        <div class="flex min-w-0 items-center gap-2.5">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#7B1E22] text-sm font-bold text-white">DM</div>
+            <div class="min-w-0">
+                <p class="truncate text-sm font-semibold text-gray-900 leading-tight">DM Kuliner POS</p>
+                <p class="truncate text-xs text-gray-500 leading-tight">{{ optional(\App\Models\Location::find($locationId))->name ?? 'Kasir' }}</p>
             </div>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex shrink-0 items-center gap-2 sm:gap-3">
             {{-- Status shift --}}
             @if ($this->currentShift)
                 <button wire:click="promptCloseShift" class="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100">
@@ -81,7 +81,7 @@
             </div>
 
             {{-- Grid menu (poll ringan agar menu sold-out hilang otomatis) --}}
-            <div class="flex-1 overflow-y-auto px-4 py-4" wire:poll.15s>
+            <div class="flex-1 overflow-y-auto px-4 py-4 pb-24 md:pb-4" wire:poll.15s>
                 @php($grouped = $this->menuItems->groupBy('vendor_id'))
                 @forelse ($grouped as $vendorId => $items)
                     @php($vColor = $this->vendorColor($items->first()->vendor->id))
@@ -118,15 +118,25 @@
             </div>
         </div>
 
-        {{-- KANAN: keranjang --}}
-        <aside class="flex w-full max-w-sm flex-col border-l border-gray-200 bg-white print:hidden">
+        {{-- Backdrop keranjang (HP) --}}
+        <div x-show="cartOpen" x-cloak @click="cartOpen = false" x-transition.opacity
+            class="fixed inset-0 z-30 bg-gray-900/40 md:hidden print:hidden"></div>
+
+        {{-- KANAN: keranjang (panel samping di tablet/desktop, panel geser di HP) --}}
+        <aside class="fixed inset-y-0 right-0 z-40 flex w-[88%] max-w-sm flex-col border-l border-gray-200 bg-white shadow-2xl transition-transform duration-300 md:static md:z-auto md:w-full md:translate-x-0 md:shadow-none print:hidden"
+            :class="cartOpen ? 'translate-x-0' : 'translate-x-full md:translate-x-0'">
             <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
                 <h2 class="text-base font-semibold text-gray-900">Keranjang
                     <span class="ml-1 text-sm font-normal text-gray-400">({{ $this->cartCount }})</span>
                 </h2>
-                @if (! empty($cart))
-                    <button wire:click="clearCart" class="text-sm font-medium text-red-500 hover:text-red-600">Kosongkan</button>
-                @endif
+                <div class="flex items-center gap-3">
+                    @if (! empty($cart))
+                        <button wire:click="clearCart" class="text-sm font-medium text-red-500 hover:text-red-600">Kosongkan</button>
+                    @endif
+                    <button @click="cartOpen = false" class="text-gray-400 hover:text-gray-600 md:hidden">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
             </div>
 
             <div class="flex-1 overflow-y-auto px-4 py-3">
@@ -165,7 +175,7 @@
                     <span class="text-sm text-gray-500">Total</span>
                     <span class="text-3xl font-extrabold text-gray-900">{{ $rp($this->cartTotal) }}</span>
                 </div>
-                <button wire:click="openPay" @disabled(empty($cart))
+                <button wire:click="openPay" @click="cartOpen = false" @disabled(empty($cart))
                     class="w-full rounded-xl bg-primary-600 py-4 text-lg font-bold text-white transition hover:bg-primary-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400">
                     BAYAR
                 </button>
@@ -173,10 +183,22 @@
         </aside>
     </div>
 
+    {{-- Bar keranjang bawah (hanya HP) --}}
+    <div class="fixed inset-x-0 bottom-0 z-20 border-t border-gray-200 bg-white px-4 py-3 md:hidden print:hidden">
+        <button @click="cartOpen = true" @disabled(empty($cart))
+            class="flex w-full items-center justify-between rounded-xl bg-primary-600 px-4 py-3 text-white transition active:scale-[0.99] disabled:bg-gray-200 disabled:text-gray-400">
+            <span class="flex items-center gap-2 text-sm font-semibold">
+                <span class="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/25 px-1.5 text-xs font-bold">{{ $this->cartCount }}</span>
+                Lihat Keranjang
+            </span>
+            <span class="text-base font-bold">{{ $rp($this->cartTotal) }}</span>
+        </button>
+    </div>
+
     {{-- ===== MODAL BAYAR ===== --}}
     @if ($showPayModal)
         <div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:hidden" wire:key="pay-modal">
-            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl"
+            <div class="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
                 x-data="{
                     total: @js($this->cartTotal),
                     discount: @entangle('discountAmount'),
@@ -270,7 +292,7 @@
         @php($order = $this->lastOrder)
         @php($loc = $order->location)
         <div class="print-layer fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:static print:bg-white print:p-0">
-            <div class="customer-receipt w-full max-w-[20rem] rounded-2xl bg-white p-6 font-mono text-[13px] leading-tight text-gray-900 shadow-xl print:max-w-none print:rounded-none print:p-2 print:shadow-none" id="receipt">
+            <div class="customer-receipt max-h-[92vh] w-full max-w-[20rem] overflow-y-auto rounded-2xl bg-white p-6 font-mono text-[13px] leading-tight text-gray-900 shadow-xl print:max-h-none print:max-w-none print:overflow-visible print:rounded-none print:p-2 print:shadow-none" id="receipt">
                 <div class="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 print:hidden">
                     <svg class="h-7 w-7 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/></svg>
                 </div>
@@ -402,7 +424,7 @@
     {{-- ===== MODAL BUKA SHIFT ===== --}}
     @if ($showOpenShift)
         <div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:hidden">
-            <div class="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <div class="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
                 <h3 class="mb-1 text-lg font-bold text-gray-900">Buka Shift</h3>
                 <p class="mb-4 text-sm text-gray-500">Masukkan kas awal (modal laci) sebelum mulai melayani.</p>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Kas Awal</label>
@@ -423,7 +445,7 @@
         @php($expected = $shift->opening_cash + $t['cash'])
         @php($variance = (int) $countedCash - $expected)
         <div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:hidden">
-            <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <div class="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
                 <h3 class="mb-1 text-lg font-bold text-gray-900">Tutup Shift &amp; Rekonsiliasi</h3>
                 <p class="mb-4 text-sm text-gray-500">Dibuka {{ $shift->opened_at->format('d/m H:i') }} · {{ $t['count'] }} transaksi</p>
 
