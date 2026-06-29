@@ -19,7 +19,7 @@
     </div>
 
     {{-- Ringkasan KPI --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         @php($kpis = [
             ['label' => 'Total Transaksi', 'value' => number_format($totals['order_count'], 0, ',', '.'), 'icon' => 'M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z', 'accent' => false],
             ['label' => 'Total Uang Masuk', 'value' => $rp($totals['total_gross']), 'icon' => 'M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z', 'accent' => false],
@@ -28,28 +28,75 @@
         ])
         @foreach ($kpis as $kpi)
             <div @class([
-                'rounded-2xl border p-5 shadow-sm',
+                'rounded-2xl border p-4 shadow-sm sm:p-5',
                 'border-primary-200 bg-primary-50 dark:border-primary-500/30 dark:bg-primary-500/10' => $kpi['accent'],
                 'border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900' => ! $kpi['accent'],
             ])>
-                <div class="flex items-center justify-between">
-                    <p @class(['text-sm font-medium', 'text-primary-700 dark:text-primary-300' => $kpi['accent'], 'text-gray-500 dark:text-gray-400' => ! $kpi['accent']])>{{ $kpi['label'] }}</p>
-                    <span @class(['flex h-8 w-8 items-center justify-center rounded-lg', 'bg-primary-100 text-primary-600 dark:bg-primary-500/20 dark:text-primary-300' => $kpi['accent'], 'bg-gray-100 text-gray-400 dark:bg-white/5 dark:text-gray-500' => ! $kpi['accent']])>
+                <div class="flex items-center justify-between gap-2">
+                    <p @class(['min-w-0 truncate text-xs font-medium sm:text-sm', 'text-primary-700 dark:text-primary-300' => $kpi['accent'], 'text-gray-500 dark:text-gray-400' => ! $kpi['accent']])>{{ $kpi['label'] }}</p>
+                    <span @class(['flex h-7 w-7 shrink-0 items-center justify-center rounded-lg sm:h-8 sm:w-8', 'bg-primary-100 text-primary-600 dark:bg-primary-500/20 dark:text-primary-300' => $kpi['accent'], 'bg-gray-100 text-gray-400 dark:bg-white/5 dark:text-gray-500' => ! $kpi['accent']])>
                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $kpi['icon'] }}" /></svg>
                     </span>
                 </div>
-                <p @class(['mt-2 text-2xl font-bold tracking-tight', 'text-primary-700 dark:text-primary-200' => $kpi['accent'], 'text-gray-900 dark:text-white' => ! $kpi['accent']])>{{ $kpi['value'] }}</p>
+                <p @class(['mt-1.5 text-xl font-bold tracking-tight sm:mt-2 sm:text-2xl', 'text-primary-700 dark:text-primary-200' => $kpi['accent'], 'text-gray-900 dark:text-white' => ! $kpi['accent']])>{{ $kpi['value'] }}</p>
             </div>
         @endforeach
     </div>
 
     {{-- Tabel per vendor --}}
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
-        <div class="flex items-center gap-2 border-b border-gray-100 px-5 py-3.5 dark:border-white/5">
+        <div class="flex items-center gap-2 border-b border-gray-100 px-4 py-3.5 dark:border-white/5 sm:px-5">
             <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" /></svg>
             <h3 class="text-sm font-semibold text-gray-900 dark:text-white">Rincian per Vendor</h3>
+            <span class="ml-auto rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 dark:bg-white/5 dark:text-gray-400">{{ $this->rows->count() }} vendor</span>
         </div>
-        <div class="overflow-x-auto">
+
+        {{-- Tampilan MOBILE: kartu bertumpuk (anti-terpotong) --}}
+        <div class="divide-y divide-gray-100 dark:divide-white/5 sm:hidden">
+            @forelse ($this->rows as $row)
+                <div class="px-4 py-3.5">
+                    <div class="flex items-center justify-between gap-2">
+                        <div class="flex min-w-0 items-center gap-2">
+                            <span class="inline-flex shrink-0 items-center rounded bg-gray-100 px-1.5 py-0.5 text-xs font-bold text-gray-600 dark:bg-white/10 dark:text-gray-300">{{ $row['code'] }}</span>
+                            <span class="truncate font-semibold text-gray-900 dark:text-white">{{ $row['name'] }}</span>
+                        </div>
+                        <span class="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 dark:bg-white/5 dark:text-gray-400">{{ number_format($row['order_count'], 0, ',', '.') }} trx</span>
+                    </div>
+                    <div class="mt-3 grid grid-cols-3 gap-2 text-center">
+                        <div class="rounded-lg bg-gray-50 py-2 dark:bg-white/5">
+                            <p class="text-[10px] font-medium uppercase tracking-wide text-gray-400">Dibayar</p>
+                            <p class="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white">{{ $rp($row['total_base_owed']) }}</p>
+                        </div>
+                        <div class="rounded-lg bg-primary-50 py-2 dark:bg-primary-500/10">
+                            <p class="text-[10px] font-medium uppercase tracking-wide text-primary-500/80">Margin</p>
+                            <p class="mt-0.5 text-sm font-bold text-primary-600 dark:text-primary-400">{{ $rp($row['total_margin']) }}</p>
+                        </div>
+                        <div class="rounded-lg bg-gray-50 py-2 dark:bg-white/5">
+                            <p class="text-[10px] font-medium uppercase tracking-wide text-gray-400">Total</p>
+                            <p class="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white">{{ $rp($row['total_gross']) }}</p>
+                        </div>
+                    </div>
+                    @if ($row['payout_account'])
+                        <p class="mt-2 truncate text-xs text-gray-400">Rekening: {{ $row['payout_account'] }}</p>
+                    @endif
+                </div>
+            @empty
+                <div class="px-5 py-12 text-center">
+                    <svg class="mx-auto mb-2 h-9 w-9 text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                    <p class="text-sm font-medium text-gray-500">Belum ada transaksi lunas pada tanggal ini.</p>
+                    <p class="text-xs text-gray-400">Data muncul otomatis setelah ada pembayaran di kasir.</p>
+                </div>
+            @endforelse
+            @if ($this->rows->isNotEmpty())
+                <div class="flex items-center justify-between bg-gray-50 px-4 py-3 dark:bg-white/5">
+                    <span class="text-sm font-bold text-gray-900 dark:text-white">TOTAL ({{ number_format($totals['order_count'], 0, ',', '.') }} trx)</span>
+                    <span class="text-sm font-bold text-primary-700 dark:text-primary-300">{{ $rp($totals['total_margin']) }}</span>
+                </div>
+            @endif
+        </div>
+
+        {{-- Tampilan DESKTOP: tabel penuh --}}
+        <div class="hidden overflow-x-auto sm:block">
         <table class="min-w-full text-sm">
             <thead>
                 <tr class="border-b border-gray-100 dark:border-white/5">

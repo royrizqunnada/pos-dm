@@ -12,6 +12,7 @@ use Filament\Enums\ThemeMode;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\View\PanelsRenderHook;
 use Filament\Support\Colors\Color;
 use Filament\Support\Enums\Width;
 use Filament\Widgets\AccountWidget;
@@ -52,6 +53,10 @@ class AdminPanelProvider extends PanelProvider
                 DashboardRingkasan::class,
                 GrafikPenjualan::class,
             ])
+            ->renderHook(
+                PanelsRenderHook::BODY_END,
+                fn (): string => view('filament.bottom-nav')->render(),
+            )
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
