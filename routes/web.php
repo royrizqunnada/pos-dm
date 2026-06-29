@@ -10,9 +10,13 @@ Route::get('/', function () {
         return redirect()->route('login');
     }
 
-    return Auth::user()->hasRole('vendor')
-        ? redirect('/vendor')
-        : redirect()->route('kasir');
+    $user = Auth::user();
+
+    return match (true) {
+        $user->hasRole('vendor') => redirect('/vendor'),
+        $user->hasRole('owner') => redirect('/admin'),
+        default => redirect()->route('kasir'),
+    };
 });
 
 // Auth

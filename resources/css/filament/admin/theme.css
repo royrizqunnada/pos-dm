@@ -3,6 +3,11 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
 
+/* =====================================================================
+   DM Kuliner POS — tema admin
+   Fokus: tampilan bersih (referensi Square/Toast) + ramah layar mobile.
+   ===================================================================== */
+
 /* Garis pemisah sidebar dengan konten + topbar (mode terang sama-sama putih). */
 .fi-sidebar {
     border-right: 1px solid #e5e7eb;
@@ -10,6 +15,7 @@
 
 .fi-topbar > nav {
     border-bottom: 1px solid #e5e7eb;
+    backdrop-filter: saturate(1.4) blur(8px);
 }
 
 .dark .fi-sidebar {
@@ -25,6 +31,7 @@
 .fi-section,
 .fi-ta {
     box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.05);
+    border-radius: 1rem;
 }
 
 .dark .fi-section,
@@ -49,7 +56,110 @@
     background: var(--primary-600, #2563eb);
 }
 
+/* Hover item navigasi terasa lebih halus. */
+.fi-sidebar-item-button {
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
 /* Header tabel sedikit lebih kalem. */
 .fi-ta-header-cell {
     letter-spacing: 0.01em;
+}
+
+/* Tombol: transisi & sedikit umpan-balik saat ditekan (penting di layar sentuh). */
+.fi-btn {
+    transition: transform 0.08s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.fi-btn:active {
+    transform: scale(0.98);
+}
+
+/* Kartu statistik (widget bawaan Filament) lebih hidup. */
+.fi-wi-stats-overview-stat {
+    border-radius: 1rem;
+    transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+/* =====================================================================
+   Ramah MOBILE (≤ 1024px)
+   - rapatkan padding agar konten lebih lega di layar kecil
+   - sudut kartu sedikit lebih kecil supaya pas
+   - tabel boleh digeser horizontal tanpa terpotong
+   ===================================================================== */
+@media (max-width: 1024px) {
+    /* Beri ruang konten utama, jangan terlalu mepet. */
+    .fi-main {
+        padding-left: 0.875rem;
+        padding-right: 0.875rem;
+    }
+
+    .fi-main-ctn {
+        padding-top: 1rem;
+    }
+
+    /* Section padding lebih ringkas di HP. */
+    .fi-section-content {
+        padding: 1rem;
+    }
+
+    .fi-section-header {
+        padding: 1rem;
+    }
+
+    /* Header halaman lebih ringkas + judul tidak kepanjangan. */
+    .fi-header {
+        gap: 0.75rem;
+    }
+
+    .fi-header-heading {
+        font-size: 1.25rem;
+        line-height: 1.75rem;
+    }
+
+    /* Tabel Filament: izinkan geser horizontal, jangan terpotong. */
+    .fi-ta-ctn {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Tombol aksi di header halaman jadi full-width biar gampang disentuh. */
+    .fi-header .fi-ac {
+        width: 100%;
+    }
+
+    .fi-header .fi-ac .fi-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 640px) {
+    /* Kartu KPI custom: sudut & padding pas untuk HP. */
+    .fi-section,
+    .fi-ta {
+        border-radius: 0.875rem;
+    }
+
+    /* Topbar lebih ringkas. */
+    .fi-topbar > nav {
+        padding-left: 0.875rem;
+        padding-right: 0.875rem;
+    }
+}
+
+/* Scrollbar tipis & halus untuk area tabel yang bisa digeser. */
+.fi-ta-ctn::-webkit-scrollbar,
+.overflow-x-auto::-webkit-scrollbar {
+    height: 6px;
+}
+
+.fi-ta-ctn::-webkit-scrollbar-thumb,
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: rgba(100, 116, 139, 0.35);
+    border-radius: 9999px;
 }

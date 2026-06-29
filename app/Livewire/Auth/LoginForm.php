@@ -33,9 +33,15 @@ class LoginForm extends Component
 
         // Arahkan sesuai role:
         // - vendor          -> portal vendor (/vendor)
-        // - lainnya (kasir/owner/manager) -> layar kasir
+        // - owner           -> panel admin (/admin) langsung
+        // - manager/kasir   -> layar kasir
         $user = Auth::user();
-        $home = $user->hasRole('vendor') ? '/vendor' : route('kasir');
+
+        $home = match (true) {
+            $user->hasRole('vendor') => '/vendor',
+            $user->hasRole('owner') => '/admin',
+            default => route('kasir'),
+        };
 
         return redirect()->intended($home);
     }
