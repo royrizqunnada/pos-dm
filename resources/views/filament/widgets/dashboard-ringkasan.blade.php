@@ -1,15 +1,15 @@
 @php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <x-filament-widgets::widget>
     <div class="space-y-5">
-        {{-- ===== Hero: ringkasan hari ini (gaya aplikasi) ===== --}}
-        <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary-600 to-primary-700 p-5 text-white shadow-lg shadow-primary-600/20 sm:p-6">
-            {{-- ornamen --}}
-            <div class="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-white/10"></div>
-            <div class="pointer-events-none absolute top-10 -right-2 h-24 w-24 rounded-full bg-white/5"></div>
+        {{-- ===== Hero: ringkasan hari ini (enterprise — slate + glow brand) ===== --}}
+        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-5 text-white shadow-sm ring-1 ring-white/10 sm:p-6">
+            {{-- glow brand halus --}}
+            <div class="pointer-events-none absolute -top-16 -right-12 h-48 w-48 rounded-full bg-primary-500/20 blur-3xl"></div>
+            <div class="pointer-events-none absolute -bottom-20 right-20 h-40 w-40 rounded-full bg-primary-600/10 blur-3xl"></div>
 
             <div class="relative">
                 <div class="flex items-center justify-between">
-                    <p class="text-sm font-medium text-white/80">Margin Saya <span class="text-white/60">· hari ini</span></p>
+                    <p class="text-sm font-medium text-white/70">Margin Saya <span class="text-white/50">· hari ini</span></p>
                     @if (! is_null($marginTrend))
                         <span @class([
                             'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold backdrop-blur',

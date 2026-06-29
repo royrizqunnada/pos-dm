@@ -27,11 +27,17 @@
 }
 
 /* ===== Sentuhan profesional ===== */
-/* Section & tabel sedikit terangkat (bukan border polos). */
+/* Section & tabel: sudut crisp + border hairline + bayangan sangat halus. */
 .fi-section,
 .fi-ta {
-    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.05);
-    border-radius: 1rem;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+    border-radius: 0.75rem;
+    border-color: #e5e7eb;
+}
+
+.dark .fi-section,
+.dark .fi-ta {
+    border-color: rgba(255, 255, 255, 0.08);
 }
 
 .dark .fi-section,
@@ -254,4 +260,89 @@
     .fi-main {
         padding-bottom: 5.5rem !important;
     }
+}
+
+/* =====================================================================
+   LAPIS ENTERPRISE — tipografi & komponen kelas profesional
+   Tujuan: rapi, padat, legible, dengan angka rata kolom ala laporan
+   keuangan. Sentuhan halus, bukan ramai.
+   ===================================================================== */
+
+/* Angka rata-lebar (tabular) di seluruh panel — penting untuk laporan
+   uang agar digit berbaris rapi. */
+body.fi-body {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* Hierarki judul lebih tegas & rapat. */
+.fi-header-heading,
+.fi-section-header-heading,
+.fi-modal-heading {
+    letter-spacing: -0.015em;
+    font-weight: 600;
+}
+
+/* Tabel: header kecil-kapital yang kalem, baris transisi halus. */
+.fi-ta-header-cell {
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+    letter-spacing: 0.045em;
+    font-weight: 600;
+    color: #64748b;
+}
+
+.dark .fi-ta-header-cell {
+    color: #94a3b8;
+}
+
+.fi-ta-row {
+    transition: background-color 0.12s ease;
+}
+
+/* Input & tombol: sudut enterprise (tidak terlalu membulat). */
+.fi-input,
+.fi-input-wrp {
+    border-radius: 0.5rem;
+}
+
+.fi-btn {
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+/* Badge sedikit lebih tegas. */
+.fi-badge {
+    font-weight: 600;
+}
+
+/* Label grup sidebar: gaya section enterprise. */
+.fi-sidebar-group-label {
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+/* Item sidebar aktif: latar lembut + teks tegas (selain aksen kiri). */
+.fi-sidebar-item-active > .fi-sidebar-item-button {
+    background-color: rgba(37, 99, 235, 0.06);
+    font-weight: 600;
+}
+
+.dark .fi-sidebar-item-active > .fi-sidebar-item-button {
+    background-color: rgba(96, 165, 250, 0.1);
+}
+
+/* Topbar & sidebar solid (kokoh, bukan transparan). */
+.fi-topbar > nav {
+    background: #ffffff;
+    backdrop-filter: none;
+}
+
+.dark .fi-topbar > nav {
+    background: #0f172a;
 }
