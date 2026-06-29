@@ -41,7 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
             ->colors([
-                'primary' => Color::hex('#7B1E22'), // maroon brand DM Kuliner
+                'primary' => Color::Blue, // biru profesional (Blue-600 #2563EB)
                 'gray' => Color::Slate,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

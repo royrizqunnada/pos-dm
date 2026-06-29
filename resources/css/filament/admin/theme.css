@@ -53,7 +53,7 @@
     height: 1.25rem;
     width: 3px;
     border-radius: 9999px;
-    background: var(--primary-600, #9b2a30);
+    background: var(--primary-600, #2563eb);
 }
 
 /* Hover item navigasi terasa lebih halus. */
@@ -228,11 +228,11 @@
 }
 
 .dm-bottom-nav__item--active {
-    color: var(--primary-600, #9b2a30);
+    color: var(--primary-600, #2563eb);
 }
 
 .dark .dm-bottom-nav__item--active {
-    color: var(--primary-400, #dc757b);
+    color: var(--primary-400, #60a5fa);
 }
 
 .dm-bottom-nav__item--active .dm-bottom-nav__icon {
