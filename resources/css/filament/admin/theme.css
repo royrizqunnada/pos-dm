@@ -37,80 +37,36 @@
 }
 
 /* =====================================================================
-   SIDEBAR GELAP (referensi dashboard enterprise) — sidebar selalu gelap,
-   konten tetap terang & bersih. Item aktif = pill primary solid.
+   SIDEBAR TERANG (putih) & bersih. Item aktif jelas: latar primary
+   lembut + teks/ikon primary, sudut halus.
    ===================================================================== */
-.fi-sidebar,
-.fi-sidebar-nav,
-.fi-sidebar-header,
-.fi-sidebar-footer {
-    background-color: #0f172a !important; /* slate-900 */
-    border-color: rgba(255, 255, 255, 0.07) !important;
+.fi-sidebar {
+    border-right: 1px solid #e5e7eb;
 }
 
-.fi-sidebar-header {
-    box-shadow: none;
+.dark .fi-sidebar {
+    border-right-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Item navigasi */
 .fi-sidebar-item-btn {
-    color: #cbd5e1; /* slate-300 */
     border-radius: 0.5rem;
     transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.fi-sidebar-item-icon {
-    color: #94a3b8; /* slate-400 */
-}
-
-.fi-sidebar-item-btn:hover {
-    background-color: rgba(255, 255, 255, 0.06);
-    color: #ffffff;
-}
-
-.fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
-    color: #ffffff;
-}
-
-/* Item AKTIF — pill primary solid + teks putih */
+/* Item AKTIF — latar primary lembut + teks/ikon primary. */
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background-color: var(--primary-600, #2563eb);
-    color: #ffffff;
+    background-color: rgba(37, 99, 235, 0.08);
+    color: var(--primary-700, #1d4ed8);
     font-weight: 600;
-    box-shadow: 0 8px 18px -8px var(--primary-600, #2563eb);
+}
+
+.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
+    background-color: rgba(96, 165, 250, 0.12);
+    color: #ffffff;
 }
 
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
-    color: #ffffff;
-}
-
-/* Wordmark brand agar terbaca di sidebar gelap (logo box tetap maroon). */
-.fi-sidebar .text-gray-950 {
-    color: #f8fafc !important;
-}
-
-.fi-sidebar .text-\[\#7B1E22\] {
-    color: #e9a0a3 !important;
-}
-
-/* Tombol ikon (collapse dll) di sidebar gelap. */
-.fi-sidebar .fi-icon-btn {
-    color: #94a3b8;
-}
-
-.fi-sidebar .fi-icon-btn:hover {
-    color: #ffffff;
-    background-color: rgba(255, 255, 255, 0.06);
-}
-
-/* Scrollbar sidebar tipis & gelap. */
-.fi-sidebar-nav::-webkit-scrollbar {
-    width: 6px;
-}
-
-.fi-sidebar-nav::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.12);
-    border-radius: 9999px;
+    color: var(--primary-600, #2563eb);
 }
 
 /* Header tabel sedikit lebih kalem. */
