@@ -22,9 +22,14 @@ class RekapPeriode extends Page
 
     protected static ?string $navigationLabel = 'Rekap Periode';
 
-    protected static ?string $title = 'Rekap Periode — Analisa & Evaluasi';
+    protected static ?string $title = 'Rekap Periode';
 
     protected static ?int $navigationSort = 0;
+
+    public function getSubheading(): ?string
+    {
+        return 'Analisa & evaluasi penjualan per periode.';
+    }
 
     public ?string $from = null;
 

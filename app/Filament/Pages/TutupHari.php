@@ -22,9 +22,14 @@ class TutupHari extends Page
 
     protected static ?string $navigationLabel = 'Tutup Hari / Settlement';
 
-    protected static ?string $title = 'Tutup Hari — Rekap Settlement Vendor';
+    protected static ?string $title = 'Tutup Hari';
 
     protected static ?int $navigationSort = 1;
+
+    public function getSubheading(): ?string
+    {
+        return 'Rekap settlement & pembayaran vendor harian.';
+    }
 
     public ?string $date = null;
 
