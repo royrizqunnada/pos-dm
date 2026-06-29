@@ -6,6 +6,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use App\Filament\Widgets\DashboardHeader;
 use App\Filament\Widgets\DashboardRingkasan;
 use App\Filament\Widgets\GrafikPenjualan;
 use Filament\Enums\ThemeMode;
@@ -40,7 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
             ->colors([
-                'primary' => Color::Blue,
+                'primary' => Color::hex('#7B1E22'), // maroon brand DM Kuliner
                 'gray' => Color::Slate,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
@@ -50,6 +51,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                DashboardHeader::class,
                 DashboardRingkasan::class,
                 GrafikPenjualan::class,
             ])
