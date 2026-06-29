@@ -20,9 +20,9 @@
         }
     </style>
     {{-- Header --}}
-    <header class="flex items-center justify-between gap-2 border-b border-gray-200 bg-white px-3 py-3 sm:px-4 print:hidden">
+    <header class="flex items-center justify-between gap-2 border-b border-gray-200/80 bg-white px-3 py-3 shadow-sm sm:px-4 print:hidden">
         <div class="flex min-w-0 items-center gap-2.5">
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#7B1E22] text-sm font-bold text-white">DM</div>
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7B1E22] to-[#9a2a30] text-sm font-bold text-white shadow-sm">DM</div>
             <div class="min-w-0">
                 <p class="truncate text-sm font-semibold text-gray-900 leading-tight">DM Kuliner POS</p>
                 <p class="truncate text-xs text-gray-500 leading-tight">{{ optional(\App\Models\Location::find($locationId))->name ?? 'Kasir' }}</p>
@@ -97,7 +97,8 @@
                                     x-data="{ pop: false }"
                                     @click="pop = true; clearTimeout($el._t); $el._t = setTimeout(() => pop = false, 600)"
                                     :class="pop ? 'border-primary-500 ring-2 ring-primary-200 scale-[0.97]' : 'border-gray-200'"
-                                    class="group relative flex min-h-[88px] flex-col justify-between rounded-xl border bg-white p-3 text-left transition duration-150 hover:border-primary-300 hover:shadow-sm active:scale-[0.96]">
+                                    class="group relative flex min-h-[88px] flex-col justify-between overflow-hidden rounded-2xl border bg-white p-3 pl-4 text-left transition duration-150 hover:border-primary-300 hover:shadow-md hover:shadow-gray-200/70 active:scale-[0.96]">
+                                    <span class="absolute inset-y-0 left-0 w-1.5" style="background-color: {{ $vColor }}"></span>
                                     <span x-show="pop" x-cloak
                                         x-transition:enter="transition ease-out duration-150"
                                         x-transition:enter-start="opacity-0 translate-y-1 scale-75"
@@ -176,7 +177,7 @@
                     <span class="text-3xl font-extrabold text-gray-900">{{ $rp($this->cartTotal) }}</span>
                 </div>
                 <button wire:click="openPay" @click="cartOpen = false" @disabled(empty($cart))
-                    class="w-full rounded-xl bg-primary-600 py-4 text-lg font-bold text-white transition hover:bg-primary-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400">
+                    class="w-full rounded-xl bg-primary-600 py-4 text-lg font-bold tracking-wide text-white shadow-lg shadow-primary-600/25 transition hover:bg-primary-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none">
                     BAYAR
                 </button>
             </div>
@@ -186,7 +187,7 @@
     {{-- Bar keranjang bawah (hanya HP) --}}
     <div class="fixed inset-x-0 bottom-0 z-20 border-t border-gray-200 bg-white px-4 py-3 md:hidden print:hidden">
         <button @click="cartOpen = true" @disabled(empty($cart))
-            class="flex w-full items-center justify-between rounded-xl bg-primary-600 px-4 py-3 text-white transition active:scale-[0.99] disabled:bg-gray-200 disabled:text-gray-400">
+            class="flex w-full items-center justify-between rounded-xl bg-primary-600 px-4 py-3 text-white shadow-lg shadow-primary-600/25 transition active:scale-[0.99] disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none">
             <span class="flex items-center gap-2 text-sm font-semibold">
                 <span class="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/25 px-1.5 text-xs font-bold">{{ $this->cartCount }}</span>
                 Lihat Keranjang
@@ -280,7 +281,7 @@
                 </div>
 
                 <button wire:click="pay"
-                    class="w-full rounded-xl bg-green-600 py-4 text-lg font-bold text-white transition hover:bg-green-700 active:scale-[0.99]">
+                    class="w-full rounded-xl bg-green-600 py-4 text-lg font-bold text-white shadow-lg shadow-green-600/25 transition hover:bg-green-700 active:scale-[0.99]">
                     Konfirmasi Bayar
                 </button>
             </div>
