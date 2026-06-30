@@ -33,6 +33,7 @@ class VendorPanelProvider extends PanelProvider
             ->brandName('Portal Vendor — DM Kuliner')
             ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2rem')
+            ->favicon('data:,')
             ->defaultThemeMode(ThemeMode::Light)
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
