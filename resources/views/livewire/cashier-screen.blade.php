@@ -225,6 +225,13 @@
                     <p x-show="disc > 0" x-cloak class="mt-1 text-xs font-medium text-red-500" x-text="'Diskon ' + rp(disc)"></p>
                 </div>
 
+                @unless ($this->currentShift)
+                    <div class="mb-4 flex items-start gap-2 rounded-xl border border-yellow-200 bg-yellow-50 px-3 py-2.5 text-xs font-medium text-yellow-800">
+                        <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+                        <span>Shift belum dibuka. Penjualan tunai tidak akan masuk rekap tutup shift.</span>
+                    </div>
+                @endunless
+
                 {{-- Nomor meja --}}
                 <div class="mb-4">
                     <label class="mb-1 block text-sm font-medium text-gray-700">Nomor Meja</label>
