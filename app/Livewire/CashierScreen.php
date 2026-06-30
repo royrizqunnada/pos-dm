@@ -382,7 +382,7 @@ class CashierScreen extends Component
             return null;
         }
 
-        return Order::with('items.vendor:id,code,name')->find($this->lastOrderId);
+        return Order::with(['items.vendor:id,code,name', 'location', 'cashier:id,name'])->find($this->lastOrderId);
     }
 
     public function voidLastOrder(): void

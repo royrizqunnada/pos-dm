@@ -280,9 +280,10 @@
                     <p class="text-sm">Tunjukkan QRIS ke pelanggan, lalu konfirmasi setelah pembayaran berhasil.</p>
                 </div>
 
-                <button wire:click="pay"
-                    class="w-full rounded-xl bg-green-600 py-4 text-lg font-bold text-white shadow-lg shadow-green-600/25 transition hover:bg-green-700 active:scale-[0.99]">
-                    Konfirmasi Bayar
+                <button wire:click="pay" wire:loading.attr="disabled" wire:target="pay"
+                    class="w-full rounded-xl bg-green-600 py-4 text-lg font-bold text-white shadow-lg shadow-green-600/25 transition hover:bg-green-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70">
+                    <span wire:loading.remove wire:target="pay">Konfirmasi Bayar</span>
+                    <span wire:loading wire:target="pay">Memproses...</span>
                 </button>
             </div>
         </div>
