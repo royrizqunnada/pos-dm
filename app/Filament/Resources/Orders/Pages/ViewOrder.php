@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Orders\Pages;
 use App\Filament\Resources\Orders\OrderResource;
 use App\Models\Order;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Support\Icons\Heroicon;
 
@@ -29,6 +30,11 @@ class ViewOrder extends ViewRecord
                         'voided_at' => now(),
                     ]);
                 }),
+            DeleteAction::make()
+                ->label('Hapus')
+                ->modalHeading('Hapus Transaksi')
+                ->modalDescription('Transaksi beserta seluruh itemnya akan dihapus permanen dan tidak lagi masuk laporan/settlement. Tindakan ini tidak dapat dibatalkan.')
+                ->visible(fn () => auth()->user()?->hasAnyRole(['owner', 'manager']) ?? false),
         ];
     }
 }

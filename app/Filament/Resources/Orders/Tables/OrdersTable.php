@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\Orders\Tables;
 
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -87,7 +90,19 @@ class OrdersTable
             ])
             ->recordActions([
                 ViewAction::make(),
+                DeleteAction::make()
+                    ->label('Hapus')
+                    ->modalHeading('Hapus Transaksi')
+                    ->modalDescription('Transaksi beserta seluruh itemnya akan dihapus permanen dan tidak lagi masuk laporan/settlement. Tindakan ini tidak dapat dibatalkan. Untuk membatalkan tanpa menghapus data, gunakan "Batalkan (Void)".')
+                    ->visible(fn () => auth()->user()?->hasAnyRole(['owner', 'manager']) ?? false),
             ])
-            ->toolbarActions([]);
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
+                        ->modalHeading('Hapus Transaksi Terpilih')
+                        ->modalDescription('Semua transaksi terpilih beserta itemnya akan dihapus permanen dan tidak lagi masuk laporan/settlement. Tindakan ini tidak dapat dibatalkan.')
+                        ->visible(fn () => auth()->user()?->hasAnyRole(['owner', 'manager']) ?? false),
+                ]),
+            ]);
     }
 }
