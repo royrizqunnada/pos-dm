@@ -210,8 +210,7 @@
                     get disc() { const d = parseInt(this.discount) || 0; return Math.max(0, Math.min(d, this.total)); },
                     get ship() { return Math.max(0, parseInt(this.shipping) || 0); },
                     get net() { return Math.max(0, this.total - this.disc); },
-                    get grand() { return this.net + this.ship; },
-                    get change() { return Math.max(0, (parseInt(this.cash) || 0) - this.grand); },
+                    get change() { return Math.max(0, (parseInt(this.cash) || 0) - this.net); },
                     rp(n) { return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID'); },
                 }">
                 <div class="mb-4 flex items-center justify-between">
@@ -223,12 +222,16 @@
 
                 <div class="mb-4 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 p-4 ring-1 ring-slate-200/70">
                     <p class="text-center text-sm text-gray-500">Total Tagihan</p>
-                    <p class="text-center text-4xl font-extrabold tracking-tight text-gray-900" x-text="rp(grand)"></p>
-                    {{-- Rincian tagihan (muncul bila ada diskon / ongkir) --}}
-                    <div class="mt-3 space-y-1 border-t border-dashed border-slate-300 pt-3 text-sm" x-show="disc > 0 || ship > 0" x-cloak>
+                    <p class="text-center text-4xl font-extrabold tracking-tight text-gray-900" x-text="rp(net)"></p>
+                    {{-- Rincian tagihan (muncul bila ada diskon) --}}
+                    <div class="mt-3 space-y-1 border-t border-dashed border-slate-300 pt-3 text-sm" x-show="disc > 0" x-cloak>
                         <div class="flex justify-between text-gray-500"><span>Subtotal</span><span x-text="rp(total)"></span></div>
-                        <div class="flex justify-between text-red-500" x-show="disc > 0" x-cloak><span>Diskon</span><span x-text="'− ' + rp(disc)"></span></div>
-                        <div class="flex justify-between text-gray-600" x-show="ship > 0" x-cloak><span>Ongkir</span><span x-text="'+ ' + rp(ship)"></span></div>
+                        <div class="flex justify-between text-red-500"><span>Diskon</span><span x-text="'− ' + rp(disc)"></span></div>
+                    </div>
+                    {{-- Ongkir hanya catatan (hak kurir) — tidak menambah total --}}
+                    <div class="mt-2 flex items-center justify-between border-t border-dashed border-slate-300 pt-2 text-xs text-gray-500" x-show="ship > 0" x-cloak>
+                        <span>Ongkir kurir <span class="text-gray-400">· catatan nota</span></span>
+                        <span x-text="rp(ship)"></span>
                     </div>
                 </div>
 
@@ -262,10 +265,11 @@
                     </div>
                 </div>
 
-                {{-- Ongkir (pesanan online) — opsional, lebih sering dikosongkan --}}
+                {{-- Ongkir (pesanan online) — hanya CATATAN di nota, hak kurir.
+                     Tidak menambah total, kembalian, kas, atau pendapatan. --}}
                 <div class="mb-4">
                     <label class="mb-1 flex items-center justify-between text-sm font-medium text-gray-700">
-                        <span>Ongkir <span class="font-normal text-gray-400">· pesanan online</span></span>
+                        <span>Ongkir kurir <span class="font-normal text-gray-400">· pesanan online</span></span>
                         <span class="text-xs font-normal text-gray-400">opsional</span>
                     </label>
                     <div class="relative">
@@ -279,8 +283,11 @@
                                 class="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">+{{ number_format($preset / 1000, 0) }}rb</button>
                         @endforeach
                     </div>
-                    <button type="button" x-show="ship > 0" x-cloak @click="shipping = null"
-                        class="mt-2 text-xs font-medium text-gray-400 hover:text-red-500">Hapus ongkir</button>
+                    <div class="mt-1.5 flex items-center justify-between">
+                        <p class="text-xs text-gray-400">Hanya tampil di nota — tidak menambah total.</p>
+                        <button type="button" x-show="ship > 0" x-cloak @click="shipping = null"
+                            class="text-xs font-medium text-gray-400 hover:text-red-500">Hapus</button>
+                    </div>
                 </div>
 
                 {{-- Metode --}}
@@ -299,7 +306,7 @@
                         class="w-full rounded-xl border border-gray-200 px-4 py-3 text-right text-2xl font-bold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
                     @error('cashReceived') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                     <div class="mt-2 grid grid-cols-4 gap-2">
-                        <button type="button" @click="cash = grand" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">Pas</button>
+                        <button type="button" @click="cash = net" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">Pas</button>
                         <button type="button" @click="cash = 20000" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">20rb</button>
                         <button type="button" @click="cash = 50000" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">50rb</button>
                         <button type="button" @click="cash = 100000" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">100rb</button>
@@ -380,12 +387,9 @@
                 <div class="border-t border-dashed border-gray-400"></div>
 
                 <div class="mt-2 space-y-0.5">
-                    <div class="flex justify-between"><span>Subtotal</span><span>{{ number_format($order->total_amount + $order->discount_amount - $order->shipping_cost, 0, ',', '.') }}</span></div>
+                    <div class="flex justify-between"><span>Subtotal</span><span>{{ number_format($order->total_amount + $order->discount_amount, 0, ',', '.') }}</span></div>
                     @if ($order->discount_amount > 0)
                         <div class="flex justify-between"><span>Diskon</span><span>-{{ number_format($order->discount_amount, 0, ',', '.') }}</span></div>
-                    @endif
-                    @if ($order->shipping_cost > 0)
-                        <div class="flex justify-between"><span>Ongkir</span><span>{{ number_format($order->shipping_cost, 0, ',', '.') }}</span></div>
                     @endif
                 </div>
 
@@ -394,6 +398,13 @@
                 <div class="flex justify-between text-base font-bold"><span>TOTAL</span><span>{{ number_format($order->total_amount, 0, ',', '.') }}</span></div>
                 <div class="mt-1 flex justify-between"><span>{{ $order->payment_method === 'qris' ? 'QRIS' : 'Tunai' }}</span><span>{{ number_format($order->paid_amount, 0, ',', '.') }}</span></div>
                 <div class="flex justify-between"><span>Kembali</span><span>{{ number_format($order->change_amount, 0, ',', '.') }}</span></div>
+
+                @if ($order->shipping_cost > 0)
+                    {{-- Ongkir hanya catatan (hak kurir), dibayar langsung ke kurir. --}}
+                    <div class="my-2 border-t border-dashed border-gray-400"></div>
+                    <div class="flex justify-between"><span>Ongkir kurir</span><span>{{ number_format($order->shipping_cost, 0, ',', '.') }}</span></div>
+                    <p class="text-[10px] text-gray-500">*ongkir dibayar langsung ke kurir</p>
+                @endif
 
                 <div class="my-2 border-t border-dashed border-gray-400"></div>
 

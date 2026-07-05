@@ -42,9 +42,10 @@ class OrderInfolist
                             ->placeholder('—')
                             ->visible(fn ($record) => (int) $record->discount_amount > 0),
                         TextEntry::make('shipping_cost')
-                            ->label('Ongkir')
+                            ->label('Ongkir (kurir)')
                             ->money('IDR', 0)
                             ->placeholder('—')
+                            ->helperText('Catatan nota, hak kurir — di luar total.')
                             ->visible(fn ($record) => (int) $record->shipping_cost > 0),
                         TextEntry::make('total_amount')->label('Total')->money('IDR', 0),
                         TextEntry::make('paid_amount')->label('Dibayar')->money('IDR', 0),

@@ -209,25 +209,20 @@ class CashierScreen extends Component
         return max(0, $this->cartTotal - $this->discountValue);
     }
 
+    /**
+     * Ongkir hanya CATATAN di nota (100% hak kurir). Tidak menambah total,
+     * tidak memengaruhi kembalian, kas, maupun pendapatan.
+     */
     #[Computed]
     public function shippingValue(): int
     {
         return max(0, (int) $this->shippingCost);
     }
 
-    /**
-     * Total tagihan akhir yang dibayar pelanggan = (belanja - diskon) + ongkir.
-     */
-    #[Computed]
-    public function grandTotal(): int
-    {
-        return $this->netTotal + $this->shippingValue;
-    }
-
     #[Computed]
     public function changeAmount(): int
     {
-        return max(0, (int) $this->cashReceived - $this->grandTotal);
+        return max(0, (int) $this->cashReceived - $this->netTotal);
     }
 
     public function addToCart(int $menuItemId): void
@@ -310,7 +305,7 @@ class CashierScreen extends Component
 
     public function setExact(): void
     {
-        $this->cashReceived = $this->grandTotal;
+        $this->cashReceived = $this->netTotal;
     }
 
     public function pay(): void
@@ -321,14 +316,13 @@ class CashierScreen extends Component
 
         $gross = $this->cartTotal;
         $discount = $this->discountValue;
+        // Ongkir hanya catatan di nota (hak kurir) — tidak menambah tagihan.
         $shipping = $this->shippingValue;
         $net = $gross - $discount;
-        // Total tagihan akhir termasuk ongkir (pesanan online).
-        $grand = $net + $shipping;
 
         if ($this->paymentMethod === 'cash') {
             $this->cashReceived = (int) $this->cashReceived;
-            if ($this->cashReceived < $grand) {
+            if ($this->cashReceived < $net) {
                 throw ValidationException::withMessages([
                     'cashReceived' => 'Uang tunai kurang dari total.',
                 ]);
@@ -336,7 +330,7 @@ class CashierScreen extends Component
             $paid = $this->cashReceived;
         } else {
             // QRIS: dianggap dibayar pas.
-            $paid = $grand;
+            $paid = $net;
         }
 
         // Hitung alokasi diskon ke tiap baris (snapshot).
@@ -351,7 +345,7 @@ class CashierScreen extends Component
         $allocations = app(\App\Services\DiscountAllocator::class)
             ->allocate($lineInputs, $discount, $this->discountBorneBy);
 
-        $order = DB::transaction(function () use ($grand, $discount, $shipping, $paid, $allocations) {
+        $order = DB::transaction(function () use ($net, $discount, $shipping, $paid, $allocations) {
             $order = Order::create([
                 'location_id' => $this->locationId,
                 'cashier_id' => auth()->id(),
@@ -360,13 +354,14 @@ class CashierScreen extends Component
                 'table_number' => $this->tableNumber ? trim($this->tableNumber) : null,
                 'status' => 'paid',
                 'payment_method' => $this->paymentMethod,
-                // total_amount = tagihan akhir (belanja - diskon + ongkir).
-                'total_amount' => $grand,
+                // total_amount = tagihan toko (belanja - diskon). Ongkir TIDAK termasuk.
+                'total_amount' => $net,
                 'discount_amount' => $discount,
                 'discount_borne_by' => $discount > 0 ? $this->discountBorneBy : null,
+                // Ongkir hanya catatan di nota (hak kurir).
                 'shipping_cost' => $shipping,
                 'paid_amount' => $paid,
-                'change_amount' => max(0, $paid - $grand),
+                'change_amount' => max(0, $paid - $net),
                 'paid_at' => now(),
             ]);
 
