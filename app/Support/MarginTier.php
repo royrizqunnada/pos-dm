@@ -34,8 +34,8 @@ class MarginTier
 
     /**
      * Margin owner untuk suatu harga jual.
-     * Mengembalikan null bila harga <= 0 atau di atas MAX_TIER_PRICE
-     * (item premium — margin harus ditentukan manual/terpisah).
+     * Mengembalikan null hanya bila harga <= 0. Harga di atas MAX_TIER_PRICE
+     * ikut tier tertinggi (4.000).
      */
     public static function for(int $sellingPrice): ?int
     {
@@ -49,6 +49,6 @@ class MarginTier
             }
         }
 
-        return null; // di atas 36.000
+        return 4000; // di atas 36.000 -> ikut tier tertinggi
     }
 }
