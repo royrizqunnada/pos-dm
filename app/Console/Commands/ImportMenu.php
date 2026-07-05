@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Location;
 use App\Models\MenuItem;
 use App\Models\Vendor;
+use App\Support\MarginTier;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -147,8 +148,11 @@ class ImportMenu extends Command
             return [max(0, $sellingPrice - $margin), $margin];
         }
 
-        // Dua-duanya kosong: base = harga_jual, margin = 0 (diedit owner nanti).
-        return [$sellingPrice, 0];
+        // Dua-duanya kosong: pakai margin tier dari harga jual (bisa diubah
+        // di dashboard menu kapan saja). Item di luar tier (>36rb) -> margin 0.
+        $margin = MarginTier::for($sellingPrice) ?? 0;
+
+        return [max(0, $sellingPrice - $margin), $margin];
     }
 
     private function toNumber(?string $value): ?int
