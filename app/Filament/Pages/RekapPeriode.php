@@ -121,12 +121,34 @@ class RekapPeriode extends Page
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('exportPdf')
+                ->label('Export PDF')
+                ->icon(Heroicon::OutlinedDocumentArrowDown)
+                ->color('primary')
+                ->action(fn () => $this->exportPdf()),
             Action::make('export')
                 ->label('Export CSV')
                 ->icon(Heroicon::OutlinedArrowDownTray)
-                ->color('primary')
+                ->color('gray')
                 ->action(fn () => $this->exportCsv()),
         ];
+    }
+
+    public function exportPdf(): \Symfony\Component\HttpFoundation\Response
+    {
+        $rows = $this->rows;
+        $location = Location::find($this->locationId);
+        $from = Carbon::parse($this->from)->translatedFormat('d M Y');
+        $to = Carbon::parse($this->to)->translatedFormat('d M Y');
+
+        return \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.settlement', [
+            'title' => 'Rekap Penjualan per Vendor',
+            'periodLabel' => 'Periode '.$from.' – '.$to,
+            'location' => $location,
+            'rows' => $rows,
+            'totals' => app(SettlementService::class)->totals($rows),
+        ])->setPaper('a4', 'portrait')
+            ->download('rekap-'.$this->from.'_sd_'.$this->to.'.pdf');
     }
 
     public function exportCsv(): StreamedResponse

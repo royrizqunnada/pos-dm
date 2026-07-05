@@ -75,12 +75,32 @@ class TutupHari extends Page
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('exportPdf')
+                ->label('Export PDF')
+                ->icon(Heroicon::OutlinedDocumentArrowDown)
+                ->color('primary')
+                ->action(fn () => $this->exportPdf()),
             Action::make('export')
                 ->label('Export CSV')
                 ->icon(Heroicon::OutlinedArrowDownTray)
-                ->color('primary')
+                ->color('gray')
                 ->action(fn () => $this->exportCsv()),
         ];
+    }
+
+    public function exportPdf(): \Symfony\Component\HttpFoundation\Response
+    {
+        $rows = $this->rows;
+        $location = Location::find($this->locationId);
+
+        return \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.settlement', [
+            'title' => 'Tutup Hari / Settlement Vendor',
+            'periodLabel' => 'Tanggal '.Carbon::parse($this->date)->translatedFormat('l, d M Y'),
+            'location' => $location,
+            'rows' => $rows,
+            'totals' => app(SettlementService::class)->totals($rows),
+        ])->setPaper('a4', 'portrait')
+            ->download('settlement-'.($location?->id ?? 'loc').'-'.$this->date.'.pdf');
     }
 
     public function exportCsv(): StreamedResponse
