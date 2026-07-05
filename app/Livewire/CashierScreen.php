@@ -348,54 +348,75 @@ class CashierScreen extends Component
         $allocations = app(\App\Services\DiscountAllocator::class)
             ->allocate($lineInputs, $discount, $this->discountBorneBy);
 
-        $order = DB::transaction(function () use ($net, $discount, $shipping, $paid, $allocations) {
-            $order = Order::create([
-                'location_id' => $this->locationId,
-                'cashier_id' => auth()->id(),
-                'shift_id' => $this->shiftId,
-                'order_number' => Order::generateOrderNumber(),
-                'table_number' => $this->tableNumber ? trim($this->tableNumber) : null,
-                'floor' => $this->floor ? trim($this->floor) : null,
-                'status' => 'paid',
-                'payment_method' => $this->paymentMethod,
-                // total_amount = tagihan toko (belanja - diskon). Ongkir TIDAK termasuk.
-                'total_amount' => $net,
-                'discount_amount' => $discount,
-                'discount_borne_by' => $discount > 0 ? $this->discountBorneBy : null,
-                // Ongkir hanya catatan di nota (hak kurir).
-                'shipping_cost' => $shipping,
-                'paid_amount' => $paid,
-                'change_amount' => max(0, $paid - $net),
-                'paid_at' => now(),
-            ]);
-
-            foreach ($this->cart as $id => $line) {
-                $alloc = $allocations[$id] ?? ['share' => 0, 'from_base' => 0, 'from_margin' => 0];
-
-                $order->items()->create([
-                    'menu_item_id' => $line['id'],
-                    'vendor_id' => $line['vendor_id'],
-                    'name_snapshot' => $line['name'],
-                    'qty' => $line['qty'],
-                    // Snapshot harga WAJIB — settlement harus tetap akurat
-                    // walau harga menu berubah nanti.
-                    'base_price_snapshot' => $line['base_price'],
-                    'margin_snapshot' => $line['margin'],
-                    'selling_price_snapshot' => $line['selling_price'],
-                    'line_total' => $line['selling_price'] * $line['qty'],
-                    'discount_share' => $alloc['share'],
-                    'discount_from_base' => $alloc['from_base'],
-                    'discount_from_margin' => $alloc['from_margin'],
-                ]);
-            }
-
-            return $order;
-        });
+        $order = $this->persistPaidOrder($net, $discount, $shipping, $paid, $allocations);
 
         $this->lastOrderId = $order->id;
         $this->showPayModal = false;
         $this->showReceipt = true;
         $this->clearCart();
+    }
+
+    /**
+     * Simpan order beserta itemnya dalam satu transaksi.
+     * Nomor order dijaga unik: bila bentrok (mis. dua kasir bayar bersamaan),
+     * regenerasi nomor lalu coba lagi maksimal 3x.
+     *
+     * @param  array<int|string, array{share:int, from_base:int, from_margin:int}>  $allocations
+     */
+    protected function persistPaidOrder(int $net, int $discount, int $shipping, int $paid, array $allocations): Order
+    {
+        for ($attempt = 1; ; $attempt++) {
+            try {
+                return DB::transaction(function () use ($net, $discount, $shipping, $paid, $allocations) {
+                    $order = Order::create([
+                        'location_id' => $this->locationId,
+                        'cashier_id' => auth()->id(),
+                        'shift_id' => $this->shiftId,
+                        'order_number' => Order::generateOrderNumber(),
+                        'table_number' => $this->tableNumber ? trim($this->tableNumber) : null,
+                        'floor' => $this->floor ? trim($this->floor) : null,
+                        'status' => 'paid',
+                        'payment_method' => $this->paymentMethod,
+                        // total_amount = tagihan toko (belanja - diskon). Ongkir TIDAK termasuk.
+                        'total_amount' => $net,
+                        'discount_amount' => $discount,
+                        'discount_borne_by' => $discount > 0 ? $this->discountBorneBy : null,
+                        // Ongkir hanya catatan di nota (hak kurir).
+                        'shipping_cost' => $shipping,
+                        'paid_amount' => $paid,
+                        'change_amount' => max(0, $paid - $net),
+                        'paid_at' => now(),
+                    ]);
+
+                    foreach ($this->cart as $id => $line) {
+                        $alloc = $allocations[$id] ?? ['share' => 0, 'from_base' => 0, 'from_margin' => 0];
+
+                        $order->items()->create([
+                            'menu_item_id' => $line['id'],
+                            'vendor_id' => $line['vendor_id'],
+                            'name_snapshot' => $line['name'],
+                            'qty' => $line['qty'],
+                            // Snapshot harga WAJIB — settlement harus tetap akurat
+                            // walau harga menu berubah nanti.
+                            'base_price_snapshot' => $line['base_price'],
+                            'margin_snapshot' => $line['margin'],
+                            'selling_price_snapshot' => $line['selling_price'],
+                            'line_total' => $line['selling_price'] * $line['qty'],
+                            'discount_share' => $alloc['share'],
+                            'discount_from_base' => $alloc['from_base'],
+                            'discount_from_margin' => $alloc['from_margin'],
+                        ]);
+                    }
+
+                    return $order;
+                });
+            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+                // Nomor order bentrok — coba lagi; menyerah setelah 3x percobaan.
+                if ($attempt >= 3) {
+                    throw $e;
+                }
+            }
+        }
     }
 
     #[Computed]
@@ -405,7 +426,7 @@ class CashierScreen extends Component
             return null;
         }
 
-        return Order::with('items.vendor:id,code,name')->find($this->lastOrderId);
+        return Order::with(['items.vendor:id,code,name', 'location', 'cashier:id,name'])->find($this->lastOrderId);
     }
 
     public function voidLastOrder(): void

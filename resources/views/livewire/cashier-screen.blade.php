@@ -243,6 +243,13 @@
                     </div>
                 </div>
 
+                @unless ($this->currentShift)
+                    <div class="mb-4 flex items-start gap-2 rounded-xl border border-yellow-200 bg-yellow-50 px-3 py-2.5 text-xs font-medium text-yellow-800">
+                        <svg class="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+                        <span>Shift belum dibuka. Penjualan tunai tidak akan masuk rekap tutup shift.</span>
+                    </div>
+                @endunless
+
                 {{-- Nomor meja & lantai --}}
                 <div class="mb-4 grid grid-cols-2 gap-3">
                     <div>
@@ -345,9 +352,10 @@
                     <p class="text-sm">Tunjukkan QRIS ke pelanggan, lalu konfirmasi setelah pembayaran berhasil.</p>
                 </div>
 
-                <button wire:click="pay"
-                    class="w-full rounded-xl bg-green-600 py-4 text-lg font-bold text-white shadow-lg shadow-green-600/25 transition hover:bg-green-700 active:scale-[0.99]">
-                    Konfirmasi Bayar
+                <button wire:click="pay" wire:loading.attr="disabled" wire:target="pay"
+                    class="w-full rounded-xl bg-green-600 py-4 text-lg font-bold text-white shadow-lg shadow-green-600/25 transition hover:bg-green-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70">
+                    <span wire:loading.remove wire:target="pay">Konfirmasi Bayar</span>
+                    <span wire:loading wire:target="pay">Memproses...</span>
                 </button>
             </div>
         </div>

@@ -37,6 +37,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('DM Kuliner POS')
             ->brandLogo(fn () => view('filament.brand'))
             ->brandLogoHeight('2rem')
+            ->favicon(asset('images/dm-kuliner-logo.png'))
             ->defaultThemeMode(ThemeMode::Light)
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
