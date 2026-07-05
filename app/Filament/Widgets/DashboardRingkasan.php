@@ -10,7 +10,7 @@ class DashboardRingkasan extends Widget
 {
     protected string $view = 'filament.widgets.dashboard-ringkasan';
 
-    protected static ?int $sort = 1;
+    protected static ?int $sort = 3;
 
     protected int|string|array $columnSpan = 'full';
 

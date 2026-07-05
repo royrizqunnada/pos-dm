@@ -8,6 +8,7 @@ use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use App\Filament\Widgets\DashboardHeader;
 use App\Filament\Widgets\DashboardRingkasan;
+use App\Filament\Widgets\DashboardStats;
 use App\Filament\Widgets\GrafikPenjualan;
 use Filament\Enums\ThemeMode;
 use Filament\Pages\Dashboard;
@@ -59,8 +60,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 DashboardHeader::class,
-                DashboardRingkasan::class,
+                DashboardStats::class,
                 GrafikPenjualan::class,
+                DashboardRingkasan::class,
             ])
             ->renderHook(
                 PanelsRenderHook::BODY_END,

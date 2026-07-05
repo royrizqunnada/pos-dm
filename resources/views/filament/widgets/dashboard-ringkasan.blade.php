@@ -1,52 +1,8 @@
 @php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <x-filament-widgets::widget>
-    <div class="space-y-5">
-        {{-- ===== Hero: ringkasan hari ini (enterprise — slate + glow brand) ===== --}}
-        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-5 text-white shadow-sm ring-1 ring-white/10 sm:p-6">
-            {{-- glow brand halus --}}
-            <div class="pointer-events-none absolute -top-16 -right-12 h-48 w-48 rounded-full bg-primary-500/20 blur-3xl"></div>
-            <div class="pointer-events-none absolute -bottom-20 right-20 h-40 w-40 rounded-full bg-primary-600/10 blur-3xl"></div>
-
-            <div class="relative">
-                <div class="flex items-center justify-between">
-                    <p class="text-sm font-medium text-white/70">Margin Saya <span class="text-white/50">· hari ini</span></p>
-                    @if (! is_null($marginTrend))
-                        <span @class([
-                            'inline-flex items-center gap-0.5 rounded-full px-2 py-0.5 text-xs font-semibold backdrop-blur',
-                            'bg-white/20 text-white' => $marginTrend >= 0,
-                            'bg-red-500/30 text-white' => $marginTrend < 0,
-                        ])>{{ $marginTrend >= 0 ? '▲' : '▼' }} {{ abs($marginTrend) }}%</span>
-                    @endif
-                </div>
-                <p class="mt-1 text-4xl font-bold tracking-tight sm:text-5xl">{{ $rp($today['total_margin']) }}</p>
-                <p class="mt-1 text-xs text-white/70">{{ now()->translatedFormat('l, d F Y') }} · vs kemarin {{ $rp($yesterday['total_margin']) }}</p>
-
-                {{-- sub-stat 2x2 --}}
-                <div class="mt-5 grid grid-cols-2 gap-x-4 gap-y-4">
-                    @php($subs = [
-                        ['label' => 'Total Penjualan', 'value' => $rp($today['total_gross'])],
-                        ['label' => 'Transaksi', 'value' => number_format($today['order_count'], 0, ',', '.').' order'],
-                        ['label' => 'Dibayar ke Vendor', 'value' => $rp($today['total_base_owed'])],
-                        ['label' => 'Rata-rata / Transaksi', 'value' => $rp($avgPerTx)],
-                    ])
-                    @foreach ($subs as $sub)
-                        <div>
-                            <p class="text-xl font-bold tracking-tight sm:text-2xl">{{ $sub['value'] }}</p>
-                            <p class="mt-0.5 text-xs text-white/70">{{ $sub['label'] }}</p>
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- ringkasan bulan ini --}}
-                <div class="mt-5 flex flex-col gap-1 border-t border-white/15 pt-4 text-sm sm:flex-row sm:items-center sm:justify-between">
-                    <span class="text-white/80">Margin bulan ini (<span class="text-white/60">{{ now()->translatedFormat('F') }}</span>): <span class="font-bold text-white">{{ $rp($month['total_margin']) }}</span></span>
-                    <span class="text-white/80">Penjualan: <span class="font-bold text-white">{{ $rp($month['total_gross']) }}</span></span>
-                </div>
-            </div>
-        </div>
-
-        {{-- ===== Top vendor hari ini ===== --}}
-        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        {{-- ===== Top vendor hari ini (2/3) ===== --}}
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900 lg:col-span-2">
             <div class="flex items-center gap-2 border-b border-gray-100 px-4 py-3.5 dark:border-white/5 sm:px-5">
                 <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" /></svg>
                 <h3 class="text-sm font-semibold text-gray-950 dark:text-white">Top Vendor Hari Ini</h3>
@@ -80,6 +36,34 @@
                         <p class="mt-1 text-xs text-gray-400">Data muncul setelah ada transaksi di kasir.</p>
                     </div>
                 @endforelse
+            </div>
+        </div>
+
+        {{-- ===== Ringkasan bulan ini (1/3) ===== --}}
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
+            <div class="flex items-center gap-2 border-b border-gray-100 px-4 py-3.5 dark:border-white/5 sm:px-5">
+                <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" /></svg>
+                <h3 class="text-sm font-semibold text-gray-950 dark:text-white">Bulan Ini</h3>
+                <span class="ml-auto text-xs font-medium capitalize text-gray-400">{{ now()->translatedFormat('F Y') }}</span>
+            </div>
+            <div class="px-5 py-5">
+                <p class="text-[11px] font-semibold uppercase tracking-[0.06em] text-gray-500 dark:text-gray-400">Margin Saya</p>
+                <p class="mt-1 text-3xl font-bold tracking-tight text-gray-950 dark:text-white">{{ $rp($month['total_margin']) }}</p>
+
+                <dl class="mt-5 space-y-3 border-t border-dashed border-gray-200 pt-4 text-sm dark:border-white/10">
+                    <div class="flex items-center justify-between">
+                        <dt class="text-gray-500 dark:text-gray-400">Total Penjualan</dt>
+                        <dd class="font-semibold text-gray-900 dark:text-white">{{ $rp($month['total_gross']) }}</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-gray-500 dark:text-gray-400">Dibayar ke Vendor</dt>
+                        <dd class="font-semibold text-gray-900 dark:text-white">{{ $rp($month['total_base_owed']) }}</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-gray-500 dark:text-gray-400">Transaksi</dt>
+                        <dd class="font-semibold text-gray-900 dark:text-white">{{ number_format($month['order_count'], 0, ',', '.') }}</dd>
+                    </div>
+                </dl>
             </div>
         </div>
     </div>
