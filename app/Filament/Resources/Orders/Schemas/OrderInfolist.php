@@ -33,6 +33,11 @@ class OrderInfolist
                         TextEntry::make('payment_method')
                             ->label('Metode Bayar')
                             ->formatStateUsing(fn (?string $state) => $state ? strtoupper($state) : '—'),
+                        TextEntry::make('table_number')->label('Meja')->placeholder('—'),
+                        TextEntry::make('floor')
+                            ->label('Lantai')
+                            ->placeholder('—')
+                            ->visible(fn ($record) => filled($record->floor)),
                         TextEntry::make('cashier.name')->label('Kasir')->placeholder('—'),
                         TextEntry::make('location.name')->label('Lokasi'),
                         TextEntry::make('created_at')->label('Dibuat')->dateTime('d M Y H:i'),

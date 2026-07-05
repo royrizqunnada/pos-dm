@@ -235,11 +235,21 @@
                     </div>
                 </div>
 
-                {{-- Nomor meja --}}
-                <div class="mb-4">
-                    <label class="mb-1 block text-sm font-medium text-gray-700">Nomor Meja</label>
-                    <input type="text" wire:model="tableNumber" inputmode="numeric" placeholder="mis. 12"
-                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                {{-- Nomor meja & lantai --}}
+                <div class="mb-4 grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700">Nomor Meja</label>
+                        <input type="text" wire:model="tableNumber" inputmode="numeric" placeholder="mis. 12"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-3 text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                    </div>
+                    <div>
+                        <label class="mb-1 flex items-center justify-between text-sm font-medium text-gray-700">
+                            <span>Lantai</span>
+                            <span class="text-xs font-normal text-gray-400">opsional</span>
+                        </label>
+                        <input type="text" wire:model="floor" inputmode="numeric" placeholder="mis. 2"
+                            class="w-full rounded-xl border border-gray-200 px-4 py-3 text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                    </div>
                 </div>
 
                 {{-- Diskon --}}
@@ -250,7 +260,9 @@
                     </label>
                     <div class="relative">
                         <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400">Rp</span>
-                        <input type="number" x-model.number="discount" inputmode="numeric" placeholder="0" min="0"
+                        <input type="text" inputmode="numeric" placeholder="0"
+                            :value="discount ? Number(discount).toLocaleString('id-ID') : ''"
+                            @input="discount = parseInt($event.target.value.replace(/\D/g, '')) || null"
                             class="w-full rounded-xl border border-gray-200 py-2.5 pl-11 pr-4 text-right text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
                     </div>
                     <div class="mt-2" x-show="disc > 0" x-cloak>
@@ -274,7 +286,9 @@
                     </label>
                     <div class="relative">
                         <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400">Rp</span>
-                        <input type="number" x-model.number="shipping" inputmode="numeric" placeholder="0" min="0"
+                        <input type="text" inputmode="numeric" placeholder="0"
+                            :value="shipping ? Number(shipping).toLocaleString('id-ID') : ''"
+                            @input="shipping = parseInt($event.target.value.replace(/\D/g, '')) || null"
                             class="w-full rounded-xl border border-gray-200 py-2.5 pl-11 pr-4 text-right text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
                     </div>
                     <div class="mt-2 flex flex-wrap gap-2" x-show="ship === 0" x-cloak>
@@ -302,7 +316,9 @@
 
                 <div class="mb-4" x-show="method === 'cash'">
                     <label class="mb-1 block text-sm font-medium text-gray-700">Uang Diterima</label>
-                    <input type="number" x-model.number="cash" inputmode="numeric" placeholder="0"
+                    <input type="text" inputmode="numeric" placeholder="0"
+                        :value="cash ? Number(cash).toLocaleString('id-ID') : ''"
+                        @input="cash = parseInt($event.target.value.replace(/\D/g, '')) || null"
                         class="w-full rounded-xl border border-gray-200 px-4 py-3 text-right text-2xl font-bold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
                     @error('cashReceived') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                     <div class="mt-2 grid grid-cols-4 gap-2">
@@ -359,6 +375,9 @@
                     <div class="flex"><span class="w-16 shrink-0">Kasir</span><span>: {{ optional($order->cashier)->name ?? '-' }}</span></div>
                     @if ($order->table_number)
                         <div class="flex"><span class="w-16 shrink-0">Meja</span><span>: <span class="font-bold">{{ $order->table_number }}</span></span></div>
+                    @endif
+                    @if ($order->floor)
+                        <div class="flex"><span class="w-16 shrink-0">Lantai</span><span>: <span class="font-bold">{{ $order->floor }}</span></span></div>
                     @endif
                     @if ($order->shipping_cost > 0)
                         <div class="flex"><span class="w-16 shrink-0">Tipe</span><span>: <span class="font-bold">Pesanan Online</span></span></div>
@@ -448,8 +467,13 @@
                             </div>
                             @if ($order->table_number)
                                 <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1">
-                                    <span class="text-[10px] font-bold uppercase leading-none">Meja</span>
+                                    <span class="text-[10px] font-bold uppercase leading-none">Meja@if ($order->floor) · Lt {{ $order->floor }}@endif</span>
                                     <span class="text-3xl font-extrabold leading-none">{{ $order->table_number }}</span>
+                                </div>
+                            @elseif ($order->floor)
+                                <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1">
+                                    <span class="text-[10px] font-bold uppercase leading-none">Lantai</span>
+                                    <span class="text-3xl font-extrabold leading-none">{{ $order->floor }}</span>
                                 </div>
                             @elseif ($order->shipping_cost > 0)
                                 <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1.5">
@@ -483,11 +507,14 @@
     {{-- ===== MODAL BUKA SHIFT ===== --}}
     @if ($showOpenShift)
         <div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:hidden">
-            <div class="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+            <div class="max-h-[92vh] w-full max-w-sm overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+                x-data="{ amount: @entangle('openingCash') }">
                 <h3 class="mb-1 text-lg font-bold text-gray-900">Buka Shift</h3>
                 <p class="mb-4 text-sm text-gray-500">Masukkan kas awal (modal laci) sebelum mulai melayani.</p>
                 <label class="mb-1 block text-sm font-medium text-gray-700">Kas Awal</label>
-                <input type="number" wire:model="openingCash" inputmode="numeric" placeholder="0" min="0"
+                <input type="text" inputmode="numeric" placeholder="0"
+                    :value="amount ? Number(amount).toLocaleString('id-ID') : ''"
+                    @input="amount = parseInt($event.target.value.replace(/\D/g, '')) || null"
                     class="w-full rounded-xl border border-gray-200 px-4 py-3 text-right text-2xl font-bold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
                 <div class="mt-5 grid grid-cols-2 gap-3">
                     <button wire:click="$set('showOpenShift', false)" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Batal</button>
@@ -504,7 +531,8 @@
         @php($expected = $shift->opening_cash + $t['cash'])
         @php($variance = (int) $countedCash - $expected)
         <div class="fixed inset-0 z-40 flex items-center justify-center bg-gray-900/40 p-4 print:hidden">
-            <div class="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl">
+            <div class="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl bg-white p-6 shadow-xl"
+                x-data="{ counted: @entangle('countedCash').live }">
                 <h3 class="mb-1 text-lg font-bold text-gray-900">Tutup Shift &amp; Rekonsiliasi</h3>
                 <p class="mb-4 text-sm text-gray-500">Dibuka {{ $shift->opened_at->format('d/m H:i') }} · {{ $t['count'] }} transaksi</p>
 
@@ -517,7 +545,9 @@
 
                 <div class="mt-4">
                     <label class="mb-1 block text-sm font-medium text-gray-700">Kas Fisik Dihitung</label>
-                    <input type="number" wire:model.live="countedCash" inputmode="numeric" placeholder="0" min="0"
+                    <input type="text" inputmode="numeric" placeholder="0"
+                        :value="counted ? Number(counted).toLocaleString('id-ID') : ''"
+                        @input="counted = parseInt($event.target.value.replace(/\D/g, '')) || null"
                         class="w-full rounded-xl border border-gray-200 px-4 py-3 text-right text-2xl font-bold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
                     @if ($countedCash !== null && $countedCash !== '')
                         <div @class([

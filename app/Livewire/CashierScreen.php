@@ -38,6 +38,8 @@ class CashierScreen extends Component
 
     public ?string $tableNumber = null;
 
+    public ?string $floor = null;
+
     // Diskon
     public ?int $discountAmount = null;
 
@@ -292,6 +294,7 @@ class CashierScreen extends Component
         $this->paymentMethod = 'cash';
         $this->cashReceived = null;
         $this->tableNumber = null;
+        $this->floor = null;
         $this->discountAmount = null;
         $this->discountBorneBy = 'owner';
         $this->shippingCost = null;
@@ -352,6 +355,7 @@ class CashierScreen extends Component
                 'shift_id' => $this->shiftId,
                 'order_number' => Order::generateOrderNumber(),
                 'table_number' => $this->tableNumber ? trim($this->tableNumber) : null,
+                'floor' => $this->floor ? trim($this->floor) : null,
                 'status' => 'paid',
                 'payment_method' => $this->paymentMethod,
                 // total_amount = tagihan toko (belanja - diskon). Ongkir TIDAK termasuk.

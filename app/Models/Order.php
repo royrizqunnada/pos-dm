@@ -17,6 +17,7 @@ class Order extends Model
         'shift_id',
         'order_number',
         'table_number',
+        'floor',
         'status',
         'payment_method',
         'total_amount',
