@@ -1,12 +1,16 @@
 <div class="relative flex min-h-screen items-center justify-center overflow-hidden bg-gradient-to-b from-slate-50 to-slate-100 px-4 py-10">
     {{-- Ornamen latar lembut --}}
-    <div class="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#7B1E22]/5 blur-3xl"></div>
-    <div class="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-primary-500/5 blur-3xl"></div>
+    <div class="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-[#d97706]/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#4A2410]/5 blur-3xl"></div>
 
     <div class="relative w-full max-w-sm">
         <div class="mb-7 text-center">
-            <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#7B1E22] text-lg font-extrabold tracking-tight text-white shadow-lg shadow-[#7B1E22]/20">DM</div>
-            <h1 class="text-2xl font-bold tracking-tight text-gray-900">DM Kuliner POS</h1>
+            @if (file_exists(public_path('images/dm-kuliner-logo.png')))
+                <img src="{{ asset('images/dm-kuliner-logo.png') }}" alt="DM Kuliner — Café & Food Court" class="mx-auto mb-3 h-24 w-auto">
+            @else
+                <div class="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4A2410] text-lg font-extrabold tracking-tight text-white shadow-lg shadow-[#4A2410]/20">DM</div>
+                <h1 class="text-2xl font-bold tracking-tight text-gray-900">DM Kuliner POS</h1>
+            @endif
             <p class="mt-1 text-sm text-gray-500">Masuk untuk mulai melayani</p>
         </div>
 

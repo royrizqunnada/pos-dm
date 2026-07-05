@@ -7,7 +7,11 @@
                 <h2 class="truncate text-xl font-bold tracking-tight text-gray-950 dark:text-white sm:text-2xl">Halo, {{ $name }} 👋</h2>
                 <p class="mt-0.5 text-xs text-gray-400">{{ $date }}</p>
             </div>
-            <span class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#7B1E22] text-base font-extrabold tracking-tight text-white shadow-lg shadow-[#7B1E22]/20 sm:flex">DM</span>
+            @if (file_exists(public_path('images/dm-kuliner-logo.png')))
+                <img src="{{ asset('images/dm-kuliner-logo.png') }}" alt="DM Kuliner" class="hidden h-12 w-auto shrink-0 sm:block">
+            @else
+                <span class="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#4A2410] text-base font-extrabold tracking-tight text-white shadow-lg shadow-[#4A2410]/20 sm:flex">DM</span>
+            @endif
         </div>
 
         {{-- Aksi cepat --}}

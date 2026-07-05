@@ -22,11 +22,19 @@
     {{-- Header --}}
     <header class="flex items-center justify-between gap-2 border-b border-gray-200/80 bg-white px-3 py-3 shadow-sm sm:px-4 print:hidden">
         <div class="flex min-w-0 items-center gap-2.5">
-            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#7B1E22] to-[#9a2a30] text-sm font-bold text-white shadow-sm">DM</div>
-            <div class="min-w-0">
-                <p class="truncate text-sm font-semibold text-gray-900 leading-tight">DM Kuliner POS</p>
-                <p class="truncate text-xs text-gray-500 leading-tight">{{ optional(\App\Models\Location::find($locationId))->name ?? 'Kasir' }}</p>
-            </div>
+            @if (file_exists(public_path('images/dm-kuliner-logo.png')))
+                <img src="{{ asset('images/dm-kuliner-logo.png') }}" alt="DM Kuliner" class="h-10 w-auto shrink-0">
+                <div class="min-w-0 border-l border-gray-200 pl-2.5">
+                    <p class="truncate text-xs font-medium uppercase tracking-wide text-gray-400 leading-tight">Kasir</p>
+                    <p class="truncate text-sm font-semibold text-gray-900 leading-tight">{{ optional(\App\Models\Location::find($locationId))->name ?? '-' }}</p>
+                </div>
+            @else
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#4A2410] to-[#7a4a2a] text-sm font-bold text-white shadow-sm">DM</div>
+                <div class="min-w-0">
+                    <p class="truncate text-sm font-semibold text-gray-900 leading-tight">DM Kuliner POS</p>
+                    <p class="truncate text-xs text-gray-500 leading-tight">{{ optional(\App\Models\Location::find($locationId))->name ?? 'Kasir' }}</p>
+                </div>
+            @endif
         </div>
         <div class="flex shrink-0 items-center gap-2 sm:gap-3">
             {{-- Status shift --}}

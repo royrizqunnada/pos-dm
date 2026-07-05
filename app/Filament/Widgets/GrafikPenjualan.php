@@ -52,8 +52,8 @@ class GrafikPenjualan extends ChartWidget
                 [
                     'label' => 'Penjualan',
                     'data' => $gross,
-                    'backgroundColor' => 'rgba(37, 99, 235, 0.16)',
-                    'borderColor' => '#2563eb',
+                    'backgroundColor' => 'rgba(217, 119, 6, 0.16)',
+                    'borderColor' => '#d97706',
                     'borderWidth' => 1.5,
                     'borderRadius' => 6,
                     'borderSkipped' => false,
@@ -62,8 +62,8 @@ class GrafikPenjualan extends ChartWidget
                 [
                     'label' => 'Margin Saya',
                     'data' => $margin,
-                    'backgroundColor' => '#7B1E22',
-                    'borderColor' => '#7B1E22',
+                    'backgroundColor' => '#4A2410',
+                    'borderColor' => '#4A2410',
                     'borderWidth' => 0,
                     'borderRadius' => 6,
                     'borderSkipped' => false,

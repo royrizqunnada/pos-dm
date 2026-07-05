@@ -55,18 +55,18 @@
 
 /* Item AKTIF — latar primary lembut + teks/ikon primary. */
 .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background-color: rgba(37, 99, 235, 0.08);
-    color: var(--primary-700, #1d4ed8);
+    background-color: rgba(180, 83, 9, 0.10);
+    color: var(--primary-700, #92400e);
     font-weight: 600;
 }
 
 .dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background-color: rgba(96, 165, 250, 0.12);
+    background-color: rgba(233, 151, 31, 0.15);
     color: #ffffff;
 }
 
 .fi-sidebar-item.fi-active .fi-sidebar-item-icon {
-    color: var(--primary-600, #2563eb);
+    color: var(--primary-600, #b45309);
 }
 
 /* Header tabel sedikit lebih kalem. */
@@ -236,11 +236,11 @@
 }
 
 .dm-bottom-nav__item--active {
-    color: var(--primary-600, #2563eb);
+    color: var(--primary-600, #b45309);
 }
 
 .dark .dm-bottom-nav__item--active {
-    color: var(--primary-400, #60a5fa);
+    color: var(--primary-400, #e9971f);
 }
 
 .dm-bottom-nav__item--active .dm-bottom-nav__icon {

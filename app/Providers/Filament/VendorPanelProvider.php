@@ -37,8 +37,13 @@ class VendorPanelProvider extends PanelProvider
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
             ->colors([
-                'primary' => Color::Blue,
-                'gray' => Color::Slate,
+                // Orange DM Kuliner (selaras logo), samakan dengan panel admin.
+                'primary' => [
+                    50 => '#fdf6ec', 100 => '#f9e6c6', 200 => '#f3cd89', 300 => '#eeb14e',
+                    400 => '#e9971f', 500 => '#d97706', 600 => '#b45309', 700 => '#92400e',
+                    800 => '#78350f', 900 => '#633012', 950 => '#3f1e0a',
+                ],
+                'gray' => Color::Stone,
             ])
             ->discoverResources(in: app_path('Filament/Vendor/Resources'), for: 'App\Filament\Vendor\Resources')
             ->discoverPages(in: app_path('Filament/Vendor/Pages'), for: 'App\Filament\Vendor\Pages')
