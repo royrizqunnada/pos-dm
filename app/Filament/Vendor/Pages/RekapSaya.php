@@ -29,6 +29,15 @@ class RekapSaya extends Page
 
     protected static ?int $navigationSort = 2;
 
+    // Disembunyikan sementara — belum ditampilkan ke vendor.
+    // Untuk mengaktifkan lagi: hapus baris ini + method canAccess() di bawah.
+    protected static bool $shouldRegisterNavigation = false;
+
+    public static function canAccess(): bool
+    {
+        return false;
+    }
+
     public ?string $from = null;
 
     public ?string $to = null;
