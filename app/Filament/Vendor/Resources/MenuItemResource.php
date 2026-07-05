@@ -55,10 +55,6 @@ class MenuItemResource extends Resource
                     ->label('Jatah Saya')
                     ->money('IDR', 0)
                     ->sortable(),
-                TextColumn::make('selling_price')
-                    ->label('Harga Jual')
-                    ->money('IDR', 0)
-                    ->sortable(),
                 ToggleColumn::make('is_available')
                     ->label('Tersedia')
                     ->onColor('success')

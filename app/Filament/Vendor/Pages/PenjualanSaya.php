@@ -65,22 +65,22 @@ class PenjualanSaya extends Page
             ->select([
                 'order_items.name_snapshot as name',
                 DB::raw('SUM(order_items.qty) as qty'),
+                // Hanya jatah vendor. Harga jual & margin owner TIDAK ditampilkan.
                 DB::raw('SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base) as base_owed'),
-                DB::raw('SUM(order_items.selling_price_snapshot * order_items.qty - order_items.discount_share) as gross'),
             ])
             ->orderByDesc('qty')
             ->get();
     }
 
     /**
-     * @return array{count:int, base_owed:int, gross:int}
+     * @return array{count:int, base_owed:int}
      */
     public function getTotalsProperty(): array
     {
         $vendor = $this->vendor;
 
         if (! $vendor || ! $this->date) {
-            return ['count' => 0, 'base_owed' => 0, 'gross' => 0];
+            return ['count' => 0, 'base_owed' => 0];
         }
 
         $date = Carbon::parse($this->date);
@@ -92,15 +92,14 @@ class PenjualanSaya extends Page
             ->whereBetween('orders.paid_at', [$date->copy()->startOfDay(), $date->copy()->endOfDay()])
             ->select([
                 DB::raw('COUNT(DISTINCT orders.id) as count'),
+                // Hanya jatah vendor. Harga jual & margin owner TIDAK ditampilkan.
                 DB::raw('SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base) as base_owed'),
-                DB::raw('SUM(order_items.selling_price_snapshot * order_items.qty - order_items.discount_share) as gross'),
             ])
             ->first();
 
         return [
             'count' => (int) ($row->count ?? 0),
             'base_owed' => (int) ($row->base_owed ?? 0),
-            'gross' => (int) ($row->gross ?? 0),
         ];
     }
 }
