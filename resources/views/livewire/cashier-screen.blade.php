@@ -467,7 +467,7 @@
                             </div>
                             @if ($order->table_number)
                                 <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1">
-                                    <span class="text-[10px] font-bold uppercase leading-none">Meja@if ($order->floor) · Lt {{ $order->floor }}@endif</span>
+                                    <span class="text-[10px] font-bold uppercase leading-none">Meja{{ $order->floor ? ' · Lt '.$order->floor : '' }}</span>
                                     <span class="text-3xl font-extrabold leading-none">{{ $order->table_number }}</span>
                                 </div>
                             @elseif ($order->floor)
