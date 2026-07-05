@@ -36,6 +36,16 @@ class OrderInfolist
                         TextEntry::make('cashier.name')->label('Kasir')->placeholder('—'),
                         TextEntry::make('location.name')->label('Lokasi'),
                         TextEntry::make('created_at')->label('Dibuat')->dateTime('d M Y H:i'),
+                        TextEntry::make('discount_amount')
+                            ->label('Diskon')
+                            ->money('IDR', 0)
+                            ->placeholder('—')
+                            ->visible(fn ($record) => (int) $record->discount_amount > 0),
+                        TextEntry::make('shipping_cost')
+                            ->label('Ongkir')
+                            ->money('IDR', 0)
+                            ->placeholder('—')
+                            ->visible(fn ($record) => (int) $record->shipping_cost > 0),
                         TextEntry::make('total_amount')->label('Total')->money('IDR', 0),
                         TextEntry::make('paid_amount')->label('Dibayar')->money('IDR', 0),
                         TextEntry::make('change_amount')->label('Kembalian')->money('IDR', 0),

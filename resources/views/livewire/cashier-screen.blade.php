@@ -204,11 +204,14 @@
                     total: @js($this->cartTotal),
                     discount: @entangle('discountAmount'),
                     borneBy: @entangle('discountBorneBy'),
+                    shipping: @entangle('shippingCost'),
                     cash: @entangle('cashReceived'),
                     method: @entangle('paymentMethod'),
                     get disc() { const d = parseInt(this.discount) || 0; return Math.max(0, Math.min(d, this.total)); },
+                    get ship() { return Math.max(0, parseInt(this.shipping) || 0); },
                     get net() { return Math.max(0, this.total - this.disc); },
-                    get change() { return Math.max(0, (parseInt(this.cash) || 0) - this.net); },
+                    get grand() { return this.net + this.ship; },
+                    get change() { return Math.max(0, (parseInt(this.cash) || 0) - this.grand); },
                     rp(n) { return 'Rp ' + Math.round(n || 0).toLocaleString('id-ID'); },
                 }">
                 <div class="mb-4 flex items-center justify-between">
@@ -218,11 +221,15 @@
                     </button>
                 </div>
 
-                <div class="mb-4 rounded-xl bg-slate-50 p-4 text-center">
-                    <p class="text-sm text-gray-500">Total Tagihan</p>
-                    <p x-show="disc > 0" x-cloak class="text-base font-medium text-gray-400 line-through" x-text="rp(total)"></p>
-                    <p class="text-4xl font-extrabold text-gray-900" x-text="rp(net)"></p>
-                    <p x-show="disc > 0" x-cloak class="mt-1 text-xs font-medium text-red-500" x-text="'Diskon ' + rp(disc)"></p>
+                <div class="mb-4 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 p-4 ring-1 ring-slate-200/70">
+                    <p class="text-center text-sm text-gray-500">Total Tagihan</p>
+                    <p class="text-center text-4xl font-extrabold tracking-tight text-gray-900" x-text="rp(grand)"></p>
+                    {{-- Rincian tagihan (muncul bila ada diskon / ongkir) --}}
+                    <div class="mt-3 space-y-1 border-t border-dashed border-slate-300 pt-3 text-sm" x-show="disc > 0 || ship > 0" x-cloak>
+                        <div class="flex justify-between text-gray-500"><span>Subtotal</span><span x-text="rp(total)"></span></div>
+                        <div class="flex justify-between text-red-500" x-show="disc > 0" x-cloak><span>Diskon</span><span x-text="'− ' + rp(disc)"></span></div>
+                        <div class="flex justify-between text-gray-600" x-show="ship > 0" x-cloak><span>Ongkir</span><span x-text="'+ ' + rp(ship)"></span></div>
+                    </div>
                 </div>
 
                 {{-- Nomor meja --}}
@@ -234,9 +241,15 @@
 
                 {{-- Diskon --}}
                 <div class="mb-4">
-                    <label class="mb-1 block text-sm font-medium text-gray-700">Diskon (opsional)</label>
-                    <input type="number" x-model.number="discount" inputmode="numeric" placeholder="0" min="0"
-                        class="w-full rounded-xl border border-gray-200 px-4 py-2.5 text-right text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                    <label class="mb-1 flex items-center justify-between text-sm font-medium text-gray-700">
+                        <span>Diskon</span>
+                        <span class="text-xs font-normal text-gray-400">opsional</span>
+                    </label>
+                    <div class="relative">
+                        <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400">Rp</span>
+                        <input type="number" x-model.number="discount" inputmode="numeric" placeholder="0" min="0"
+                            class="w-full rounded-xl border border-gray-200 py-2.5 pl-11 pr-4 text-right text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                    </div>
                     <div class="mt-2" x-show="disc > 0" x-cloak>
                         <p class="mb-1 text-xs text-gray-500">Ditanggung oleh</p>
                         <div class="grid grid-cols-3 gap-2">
@@ -247,6 +260,27 @@
                             @endforeach
                         </div>
                     </div>
+                </div>
+
+                {{-- Ongkir (pesanan online) — opsional, lebih sering dikosongkan --}}
+                <div class="mb-4">
+                    <label class="mb-1 flex items-center justify-between text-sm font-medium text-gray-700">
+                        <span>Ongkir <span class="font-normal text-gray-400">· pesanan online</span></span>
+                        <span class="text-xs font-normal text-gray-400">opsional</span>
+                    </label>
+                    <div class="relative">
+                        <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm font-medium text-gray-400">Rp</span>
+                        <input type="number" x-model.number="shipping" inputmode="numeric" placeholder="0" min="0"
+                            class="w-full rounded-xl border border-gray-200 py-2.5 pl-11 pr-4 text-right text-lg font-semibold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                    </div>
+                    <div class="mt-2 flex flex-wrap gap-2" x-show="ship === 0" x-cloak>
+                        @foreach ([5000, 8000, 10000, 15000] as $preset)
+                            <button type="button" @click="shipping = {{ $preset }}"
+                                class="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50">+{{ number_format($preset / 1000, 0) }}rb</button>
+                        @endforeach
+                    </div>
+                    <button type="button" x-show="ship > 0" x-cloak @click="shipping = null"
+                        class="mt-2 text-xs font-medium text-gray-400 hover:text-red-500">Hapus ongkir</button>
                 </div>
 
                 {{-- Metode --}}
@@ -265,7 +299,7 @@
                         class="w-full rounded-xl border border-gray-200 px-4 py-3 text-right text-2xl font-bold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
                     @error('cashReceived') <p class="mt-1 text-sm text-red-500">{{ $message }}</p> @enderror
                     <div class="mt-2 grid grid-cols-4 gap-2">
-                        <button type="button" @click="cash = net" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">Pas</button>
+                        <button type="button" @click="cash = grand" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">Pas</button>
                         <button type="button" @click="cash = 20000" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">20rb</button>
                         <button type="button" @click="cash = 50000" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">50rb</button>
                         <button type="button" @click="cash = 100000" class="rounded-lg border border-gray-200 py-2 text-xs font-semibold text-gray-600 hover:bg-gray-50">100rb</button>
@@ -319,6 +353,9 @@
                     @if ($order->table_number)
                         <div class="flex"><span class="w-16 shrink-0">Meja</span><span>: <span class="font-bold">{{ $order->table_number }}</span></span></div>
                     @endif
+                    @if ($order->shipping_cost > 0)
+                        <div class="flex"><span class="w-16 shrink-0">Tipe</span><span>: <span class="font-bold">Pesanan Online</span></span></div>
+                    @endif
                 </div>
 
                 @if ($order->status === 'void')
@@ -343,8 +380,13 @@
                 <div class="border-t border-dashed border-gray-400"></div>
 
                 <div class="mt-2 space-y-0.5">
-                    <div class="flex justify-between"><span>Subtotal</span><span>{{ number_format($order->total_amount + $order->discount_amount, 0, ',', '.') }}</span></div>
-                    <div class="flex justify-between"><span>Diskon</span><span>{{ number_format($order->discount_amount, 0, ',', '.') }}</span></div>
+                    <div class="flex justify-between"><span>Subtotal</span><span>{{ number_format($order->total_amount + $order->discount_amount - $order->shipping_cost, 0, ',', '.') }}</span></div>
+                    @if ($order->discount_amount > 0)
+                        <div class="flex justify-between"><span>Diskon</span><span>-{{ number_format($order->discount_amount, 0, ',', '.') }}</span></div>
+                    @endif
+                    @if ($order->shipping_cost > 0)
+                        <div class="flex justify-between"><span>Ongkir</span><span>{{ number_format($order->shipping_cost, 0, ',', '.') }}</span></div>
+                    @endif
                 </div>
 
                 <div class="my-2 border-t border-dashed border-gray-400"></div>
@@ -397,6 +439,11 @@
                                 <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1">
                                     <span class="text-[10px] font-bold uppercase leading-none">Meja</span>
                                     <span class="text-3xl font-extrabold leading-none">{{ $order->table_number }}</span>
+                                </div>
+                            @elseif ($order->shipping_cost > 0)
+                                <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1.5">
+                                    <span class="text-[10px] font-bold uppercase leading-none">Pesanan</span>
+                                    <span class="text-lg font-extrabold uppercase leading-tight">Online</span>
                                 </div>
                             @endif
                         </div>

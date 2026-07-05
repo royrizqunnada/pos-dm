@@ -45,6 +45,11 @@ class OrdersTable
                     ->label('Metode')
                     ->badge()
                     ->formatStateUsing(fn (?string $state) => $state ? strtoupper($state) : '—'),
+                TextColumn::make('shipping_cost')
+                    ->label('Ongkir')
+                    ->money('IDR', 0)
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('total_amount')
                     ->label('Total')
                     ->money('IDR', 0)
