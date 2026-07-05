@@ -90,17 +90,26 @@ class SettlementService
      */
     public function dailySeries(Carbon $from, Carbon $to, ?int $locationId = null): array
     {
+        // Ekspresi tanggal portabel lintas-DB. Di Postgres CAST AS date benar,
+        // tapi di SQLite (DB test) CAST AS date malah jadi angka tahun — jadi
+        // pilih fungsi tanggal sesuai driver. Aman dari injeksi (dari nama driver).
+        $dateExpr = match (DB::connection()->getDriverName()) {
+            'mysql', 'mariadb' => 'DATE(orders.paid_at)',
+            'sqlite' => 'date(orders.paid_at)',
+            default => 'CAST(orders.paid_at AS date)', // pgsql & lainnya
+        };
+
         return DB::table('order_items')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
             ->where('orders.status', 'paid')
             ->whereBetween('orders.paid_at', [$from, $to])
             ->when($locationId, fn ($q) => $q->where('orders.location_id', $locationId))
-            ->selectRaw('CAST(orders.paid_at AS date) as d')
+            ->selectRaw("{$dateExpr} as d")
             ->selectRaw('COUNT(DISTINCT orders.id) as order_count')
             ->selectRaw('COALESCE(SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base), 0) as total_base_owed')
             ->selectRaw('COALESCE(SUM(order_items.margin_snapshot * order_items.qty - order_items.discount_from_margin), 0) as total_margin')
             ->selectRaw('COALESCE(SUM(order_items.selling_price_snapshot * order_items.qty - order_items.discount_share), 0) as total_gross')
-            ->groupByRaw('CAST(orders.paid_at AS date)')
+            ->groupByRaw($dateExpr)
             ->get()
             ->keyBy(fn ($r) => (string) $r->d)
             ->map(fn ($r) => [

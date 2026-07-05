@@ -26,7 +26,7 @@ class DashboardStats extends Widget
         $s = app(SettlementService::class);
 
         // Satu query mencakup hari ini, kemarin, & 7 hari terakhir.
-        $daily = $s->dailySeries(now()->subDays(7)->startOfDay(), now()->endOfDay());
+        $daily = $s->dailySeries(now()->subDays(6)->startOfDay(), now()->endOfDay());
         $empty = $s->emptyAggregate();
         $on = fn (int $back): array => $daily[now()->subDays($back)->format('Y-m-d')] ?? $empty;
 
