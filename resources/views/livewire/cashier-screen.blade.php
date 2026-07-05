@@ -1,6 +1,11 @@
 @php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <div class="pos-root flex h-screen flex-col bg-slate-50"
-    x-data="{ cartOpen: false, printMode: 'receipt', doPrint(mode) { this.printMode = mode; this.$nextTick(() => window.print()); } }"
+    x-data="{
+        cartOpen: false,
+        printMode: 'receipt',
+        doPrint(mode) { this.printMode = mode; this.$nextTick(() => window.print()); },
+        rawbt(b64) { if (b64) { window.location.href = 'rawbt:base64,' + b64; } },
+    }"
     :class="printMode === 'kitchen' ? 'mode-kitchen' : 'mode-receipt'">
     <style>
         [x-cloak] { display: none !important; }
@@ -455,9 +460,13 @@
                 </div>
 
                 <div class="mt-6 grid grid-cols-2 gap-3 print:hidden">
-                    <button @click="doPrint('receipt')" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Cetak Struk</button>
-                    <button @click="doPrint('kitchen')" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Tiket Dapur</button>
-                    <button wire:click="newOrder" class="col-span-2 rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white hover:bg-primary-700">Transaksi Baru</button>
+                    {{-- Cetak otomatis ke printer thermal via RawBT (1-klik, tanpa dialog) --}}
+                    <button @click="rawbt(@js($this->receiptEscpos))" class="rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white hover:bg-primary-700">Cetak Struk</button>
+                    <button @click="rawbt(@js($this->kitchenEscpos))" class="rounded-xl border border-primary-200 bg-primary-50 py-3 text-sm font-semibold text-primary-700 hover:bg-primary-100">Tiket Dapur</button>
+                    <button wire:click="newOrder" class="col-span-2 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-700">Transaksi Baru</button>
+                    {{-- Cadangan: cetak lewat dialog browser (mis. kalau RawBT bermasalah) --}}
+                    <button @click="doPrint('receipt')" class="rounded-xl border border-gray-200 py-2 text-xs font-medium text-gray-500 hover:bg-gray-50">Struk (browser)</button>
+                    <button @click="doPrint('kitchen')" class="rounded-xl border border-gray-200 py-2 text-xs font-medium text-gray-500 hover:bg-gray-50">Tiket (browser)</button>
                     @if ($order->status !== 'void')
                         <button wire:click="voidLastOrder" wire:confirm="Batalkan transaksi ini? Tidak akan dihitung di settlement."
                             class="col-span-2 rounded-xl border border-red-200 py-2 text-sm font-medium text-red-600 hover:bg-red-50">Batalkan Transaksi</button>

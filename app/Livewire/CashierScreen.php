@@ -429,6 +429,25 @@ class CashierScreen extends Component
         return Order::with(['items.vendor:id,code,name', 'location', 'cashier:id,name'])->find($this->lastOrderId);
     }
 
+    /**
+     * Data ESC/POS (base64) untuk cetak otomatis via RawBT. Lebar 32 = 58mm.
+     */
+    #[Computed]
+    public function receiptEscpos(): string
+    {
+        $order = $this->lastOrder;
+
+        return $order ? base64_encode(\App\Support\ThermalReceipt::receipt($order, 32)) : '';
+    }
+
+    #[Computed]
+    public function kitchenEscpos(): string
+    {
+        $order = $this->lastOrder;
+
+        return $order ? base64_encode(\App\Support\ThermalReceipt::kitchenTickets($order, 32)) : '';
+    }
+
     public function voidLastOrder(): void
     {
         $order = $this->lastOrder;
