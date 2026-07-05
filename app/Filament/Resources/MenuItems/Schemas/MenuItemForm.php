@@ -75,6 +75,8 @@ class MenuItemForm
                 FileUpload::make('image_path')
                     ->label('Foto Menu')
                     ->image()
+                    ->maxSize(2048) // maksimal 2 MB
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                     ->directory('menu-images')
                     ->columnSpanFull(),
             ]);
