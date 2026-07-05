@@ -25,14 +25,18 @@ class DashboardStats extends Widget
     {
         $s = app(SettlementService::class);
 
-        $today = $s->aggregate(now()->startOfDay(), now()->endOfDay());
-        $yesterday = $s->aggregate(now()->subDay()->startOfDay(), now()->subDay()->endOfDay());
+        // Satu query mencakup hari ini, kemarin, & 7 hari terakhir.
+        $daily = $s->dailySeries(now()->subDays(7)->startOfDay(), now()->endOfDay());
+        $empty = $s->emptyAggregate();
+        $on = fn (int $back): array => $daily[now()->subDays($back)->format('Y-m-d')] ?? $empty;
 
-        // Seri 7 hari terakhir untuk sparkline.
+        $today = $on(0);
+        $yesterday = $on(1);
+
+        // Seri 7 hari terakhir (lama -> hari ini) untuk sparkline.
         $days = [];
         for ($i = 6; $i >= 0; $i--) {
-            $d = now()->subDays($i);
-            $days[] = $s->aggregate($d->copy()->startOfDay(), $d->copy()->endOfDay());
+            $days[] = $on($i);
         }
         $series = fn (string $key): array => array_map(fn ($a) => (int) $a[$key], $days);
 

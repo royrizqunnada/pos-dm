@@ -81,6 +81,48 @@ class SettlementService
     }
 
     /**
+     * Agregat HARIAN dalam SATU query untuk rentang tanggal (dikelompokkan per
+     * tanggal paid_at). Dipakai dashboard agar tidak menembak 1 query per hari.
+     * Hasil dikunci berdasarkan 'Y-m-d'; tanggal tanpa transaksi tidak muncul
+     * (pemanggil memakai emptyAggregate() sebagai default).
+     *
+     * @return array<string, array{order_count:int, total_base_owed:int, total_margin:int, total_gross:int}>
+     */
+    public function dailySeries(Carbon $from, Carbon $to, ?int $locationId = null): array
+    {
+        return DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('orders.status', 'paid')
+            ->whereBetween('orders.paid_at', [$from, $to])
+            ->when($locationId, fn ($q) => $q->where('orders.location_id', $locationId))
+            ->selectRaw('CAST(orders.paid_at AS date) as d')
+            ->selectRaw('COUNT(DISTINCT orders.id) as order_count')
+            ->selectRaw('COALESCE(SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base), 0) as total_base_owed')
+            ->selectRaw('COALESCE(SUM(order_items.margin_snapshot * order_items.qty - order_items.discount_from_margin), 0) as total_margin')
+            ->selectRaw('COALESCE(SUM(order_items.selling_price_snapshot * order_items.qty - order_items.discount_share), 0) as total_gross')
+            ->groupByRaw('CAST(orders.paid_at AS date)')
+            ->get()
+            ->keyBy(fn ($r) => (string) $r->d)
+            ->map(fn ($r) => [
+                'order_count' => (int) $r->order_count,
+                'total_base_owed' => (int) $r->total_base_owed,
+                'total_margin' => (int) $r->total_margin,
+                'total_gross' => (int) $r->total_gross,
+            ])
+            ->all();
+    }
+
+    /**
+     * Nilai agregat kosong (semua nol) — default untuk hari tanpa transaksi.
+     *
+     * @return array{order_count:int, total_base_owed:int, total_margin:int, total_gross:int}
+     */
+    public function emptyAggregate(): array
+    {
+        return ['order_count' => 0, 'total_base_owed' => 0, 'total_margin' => 0, 'total_gross' => 0];
+    }
+
+    /**
      * Menu terlaris dalam rentang waktu (berdasarkan qty terjual), order 'paid'.
      *
      * @return Collection<int, object>

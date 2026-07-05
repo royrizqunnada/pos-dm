@@ -35,13 +35,17 @@ class GrafikPenjualan extends ChartWidget
     {
         $service = app(SettlementService::class);
 
+        // Satu query untuk 14 hari, lalu dipetakan per tanggal.
+        $series = $service->dailySeries(now()->subDays(13)->startOfDay(), now()->endOfDay());
+        $empty = $service->emptyAggregate();
+
         $labels = [];
         $gross = [];
         $margin = [];
 
         for ($i = 13; $i >= 0; $i--) {
             $d = now()->subDays($i);
-            $agg = $service->aggregate($d->copy()->startOfDay(), $d->copy()->endOfDay());
+            $agg = $series[$d->format('Y-m-d')] ?? $empty;
             $labels[] = $d->translatedFormat('d M');
             $gross[] = $agg['total_gross'];
             $margin[] = $agg['total_margin'];

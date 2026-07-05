@@ -26,13 +26,7 @@ class DashboardRingkasan extends Widget
     {
         $s = app(SettlementService::class);
 
-        $today = $s->aggregate(now()->startOfDay(), now()->endOfDay());
-        $yesterday = $s->aggregate(now()->subDay()->startOfDay(), now()->subDay()->endOfDay());
         $month = $s->aggregate(now()->startOfMonth(), now()->endOfDay());
-
-        $avgPerTx = $today['order_count'] > 0
-            ? intdiv($today['total_gross'], $today['order_count'])
-            : 0;
 
         $topVendors = DB::table('order_items')
             ->join('orders', 'orders.id', '=', 'order_items.order_id')
@@ -48,25 +42,10 @@ class DashboardRingkasan extends Widget
             ->limit(5)
             ->get();
 
-        $maxBase = (int) ($topVendors->max('base_owed') ?: 1);
-
         return [
-            'today' => $today,
-            'yesterday' => $yesterday,
             'month' => $month,
-            'avgPerTx' => $avgPerTx,
-            'marginTrend' => $this->trendPct($today['total_margin'], $yesterday['total_margin']),
             'topVendors' => $topVendors,
-            'maxBase' => $maxBase,
+            'maxBase' => (int) ($topVendors->max('base_owed') ?: 1),
         ];
-    }
-
-    private function trendPct(int $now, int $prev): ?int
-    {
-        if ($prev === 0) {
-            return null;
-        }
-
-        return (int) round((($now - $prev) / $prev) * 100);
     }
 }
