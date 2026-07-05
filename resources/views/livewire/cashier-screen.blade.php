@@ -375,9 +375,8 @@
                 <div class="text-center">
                     @if (file_exists(public_path('images/dm-kuliner-logo.png')))
                         <img src="{{ asset('images/dm-kuliner-logo.png') }}" alt="{{ $loc?->receipt_name ?: 'DM Kuliner' }}" class="mx-auto mb-1.5 h-16 w-auto">
-                    @else
-                        <p class="text-base font-bold tracking-widest">{{ strtoupper($loc?->receipt_name ?: 'DM Kuliner') }}</p>
                     @endif
+                    <p class="text-base font-bold tracking-widest">{{ strtoupper($loc?->receipt_name ?: 'DM Kuliner') }}</p>
                     @if ($loc?->address)
                         <p class="text-[11px] text-gray-600">{{ $loc->address }}</p>
                     @endif
