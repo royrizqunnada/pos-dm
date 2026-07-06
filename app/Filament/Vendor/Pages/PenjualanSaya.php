@@ -3,13 +3,13 @@
 namespace App\Filament\Vendor\Pages;
 
 use App\Models\Vendor;
+use App\Services\SettlementService;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Panel;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class PenjualanSaya extends Page
 {
@@ -56,50 +56,24 @@ class PenjualanSaya extends Page
 
         $date = Carbon::parse($this->date);
 
-        return DB::table('order_items')
-            ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->where('order_items.vendor_id', $vendor->id)
-            ->where('orders.status', 'paid')
-            ->whereBetween('orders.paid_at', [$date->copy()->startOfDay(), $date->copy()->endOfDay()])
-            ->groupBy('order_items.name_snapshot')
-            ->select([
-                'order_items.name_snapshot as name',
-                DB::raw('SUM(order_items.qty) as qty'),
-                // Hanya jatah vendor. Harga jual & margin owner TIDAK ditampilkan.
-                DB::raw('SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base) as base_owed'),
-            ])
-            ->orderByDesc('qty')
-            ->get();
+        return app(SettlementService::class)
+            ->vendorMenuBreakdown($vendor->id, $date->copy()->startOfDay(), $date->copy()->endOfDay());
     }
 
     /**
-     * @return array{count:int, base_owed:int}
+     * @return array{count:int, qty:int, base_owed:int}
      */
     public function getTotalsProperty(): array
     {
         $vendor = $this->vendor;
 
         if (! $vendor || ! $this->date) {
-            return ['count' => 0, 'base_owed' => 0];
+            return ['count' => 0, 'qty' => 0, 'base_owed' => 0];
         }
 
         $date = Carbon::parse($this->date);
 
-        $row = DB::table('order_items')
-            ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->where('order_items.vendor_id', $vendor->id)
-            ->where('orders.status', 'paid')
-            ->whereBetween('orders.paid_at', [$date->copy()->startOfDay(), $date->copy()->endOfDay()])
-            ->select([
-                DB::raw('COUNT(DISTINCT orders.id) as count'),
-                // Hanya jatah vendor. Harga jual & margin owner TIDAK ditampilkan.
-                DB::raw('SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base) as base_owed'),
-            ])
-            ->first();
-
-        return [
-            'count' => (int) ($row->count ?? 0),
-            'base_owed' => (int) ($row->base_owed ?? 0),
-        ];
+        return app(SettlementService::class)
+            ->vendorTotals($vendor->id, $date->copy()->startOfDay(), $date->copy()->endOfDay());
     }
 }

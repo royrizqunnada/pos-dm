@@ -3,13 +3,13 @@
 namespace App\Filament\Vendor\Pages;
 
 use App\Models\Vendor;
+use App\Services\SettlementService;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -97,19 +97,7 @@ class RekapSaya extends Page
 
         [$from, $to] = $this->range();
 
-        return DB::table('order_items')
-            ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->where('order_items.vendor_id', $vendor->id)
-            ->where('orders.status', 'paid')
-            ->whereBetween('orders.paid_at', [$from, $to])
-            ->groupBy('order_items.name_snapshot')
-            ->select([
-                'order_items.name_snapshot as name',
-                DB::raw('SUM(order_items.qty) as qty'),
-                DB::raw('SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base) as base_owed'),
-            ])
-            ->orderByDesc('qty')
-            ->get();
+        return app(SettlementService::class)->vendorMenuBreakdown($vendor->id, $from, $to);
     }
 
     /**
@@ -125,23 +113,7 @@ class RekapSaya extends Page
 
         [$from, $to] = $this->range();
 
-        $row = DB::table('order_items')
-            ->join('orders', 'orders.id', '=', 'order_items.order_id')
-            ->where('order_items.vendor_id', $vendor->id)
-            ->where('orders.status', 'paid')
-            ->whereBetween('orders.paid_at', [$from, $to])
-            ->select([
-                DB::raw('COUNT(DISTINCT orders.id) as count'),
-                DB::raw('SUM(order_items.qty) as qty'),
-                DB::raw('SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base) as base_owed'),
-            ])
-            ->first();
-
-        return [
-            'count' => (int) ($row->count ?? 0),
-            'qty' => (int) ($row->qty ?? 0),
-            'base_owed' => (int) ($row->base_owed ?? 0),
-        ];
+        return app(SettlementService::class)->vendorTotals($vendor->id, $from, $to);
     }
 
     public function getDayCountProperty(): int

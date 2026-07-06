@@ -132,6 +132,51 @@ class SettlementService
     }
 
     /**
+     * Rincian per menu untuk SATU vendor (jatah vendor saja) — dipakai portal
+     * vendor. Diurut terlaris. Tidak memuat harga jual/margin owner.
+     *
+     * @return Collection<int, object>
+     */
+    public function vendorMenuBreakdown(int $vendorId, Carbon $from, Carbon $to): Collection
+    {
+        return DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('order_items.vendor_id', $vendorId)
+            ->where('orders.status', 'paid')
+            ->whereBetween('orders.paid_at', [$from, $to])
+            ->groupBy('order_items.name_snapshot')
+            ->selectRaw('order_items.name_snapshot as name')
+            ->selectRaw('SUM(order_items.qty) as qty')
+            ->selectRaw('SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base) as base_owed')
+            ->orderByDesc('qty')
+            ->get();
+    }
+
+    /**
+     * Total untuk SATU vendor (jumlah transaksi, porsi, jatah).
+     *
+     * @return array{count:int, qty:int, base_owed:int}
+     */
+    public function vendorTotals(int $vendorId, Carbon $from, Carbon $to): array
+    {
+        $row = DB::table('order_items')
+            ->join('orders', 'orders.id', '=', 'order_items.order_id')
+            ->where('order_items.vendor_id', $vendorId)
+            ->where('orders.status', 'paid')
+            ->whereBetween('orders.paid_at', [$from, $to])
+            ->selectRaw('COUNT(DISTINCT orders.id) as count')
+            ->selectRaw('COALESCE(SUM(order_items.qty), 0) as qty')
+            ->selectRaw('COALESCE(SUM(order_items.base_price_snapshot * order_items.qty - order_items.discount_from_base), 0) as base_owed')
+            ->first();
+
+        return [
+            'count' => (int) ($row->count ?? 0),
+            'qty' => (int) ($row->qty ?? 0),
+            'base_owed' => (int) ($row->base_owed ?? 0),
+        ];
+    }
+
+    /**
      * Menu terlaris dalam rentang waktu (berdasarkan qty terjual), order 'paid'.
      *
      * @return Collection<int, object>

@@ -2,8 +2,6 @@
 <div class="pos-root flex h-screen flex-col bg-slate-50"
     x-data="{
         cartOpen: false,
-        printMode: 'receipt',
-        doPrint(mode) { this.printMode = mode; this.$nextTick(() => window.print()); },
         rawbt(b64) {
             if (!b64) { alert('Data cetak kosong — coba ulangi.'); return; }
             const a = document.createElement('a');
@@ -13,24 +11,9 @@
             a.click();
             setTimeout(() => a.remove(), 2000);
         },
-    }"
-    :class="printMode === 'kitchen' ? 'mode-kitchen' : 'mode-receipt'">
+    }">
     <style>
         [x-cloak] { display: none !important; }
-        /* Hilangkan margin halaman => buang header/footer browser (tanggal, URL, nomor halaman). */
-        @page { margin: 0; }
-        @media print {
-            /* Paksa cetak warna latar (qty/badge) bila printer mendukung. */
-            .print-layer, .print-layer * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            /* Hanya cetak lapisan aktif (struk/tiket), sembunyikan UI lain. */
-            .pos-root > :not(.print-layer) { display: none !important; }
-            .print-layer { position: static !important; background: #fff !important; padding: 0 !important; }
-            .mode-receipt .kitchen-tickets { display: none !important; }
-            .mode-kitchen .customer-receipt { display: none !important; }
-            .mode-kitchen .kitchen-tickets { display: block !important; }
-            .kitchen-ticket { page-break-after: always; }
-            .kitchen-ticket:last-child { page-break-after: auto; }
-        }
     </style>
     {{-- Header --}}
     <header class="flex items-center justify-between gap-2 border-b border-gray-200/80 bg-white px-3 py-3 shadow-sm sm:px-4 print:hidden">
@@ -479,61 +462,6 @@
                 </div>
             </div>
 
-            {{-- Tiket dapur per vendor (hanya tampil saat cetak mode dapur) --}}
-            <div class="kitchen-tickets hidden">
-                @foreach ($order->items->groupBy('vendor_id') as $vendorItems)
-                    @php($vendor = $vendorItems->first()->vendor)
-                    <div class="kitchen-ticket mx-auto max-w-sm bg-white p-5 font-mono text-gray-900">
-                        {{-- Header terbingkai --}}
-                        <div class="border-2 border-gray-900 px-3 py-2 text-center">
-                            <p class="text-[11px] font-bold uppercase tracking-[0.25em]">Tiket Dapur</p>
-                            <p class="text-2xl font-extrabold uppercase leading-tight">{{ optional($vendor)->name }}</p>
-                            <p class="text-xs font-semibold">{{ optional($vendor)->code }}</p>
-                        </div>
-
-                        {{-- Order + meja --}}
-                        <div class="mt-3 flex items-stretch justify-between gap-3">
-                            <div class="min-w-0">
-                                <p class="text-[10px] uppercase tracking-wide text-gray-500">No. Order</p>
-                                <p class="truncate text-sm font-bold">{{ $order->order_number }}</p>
-                                <p class="text-xs text-gray-600">{{ $order->created_at->format('d/m/Y · H:i') }}</p>
-                            </div>
-                            @if ($order->table_number)
-                                <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1">
-                                    <span class="text-[10px] font-bold uppercase leading-none">Meja{{ $order->floor ? ' · Lt '.$order->floor : '' }}</span>
-                                    <span class="text-3xl font-extrabold leading-none">{{ $order->table_number }}</span>
-                                </div>
-                            @elseif ($order->floor)
-                                <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1">
-                                    <span class="text-[10px] font-bold uppercase leading-none">Lantai</span>
-                                    <span class="text-3xl font-extrabold leading-none">{{ $order->floor }}</span>
-                                </div>
-                            @elseif ($order->shipping_cost > 0)
-                                <div class="flex flex-col items-center justify-center border-2 border-gray-900 px-3 py-1.5">
-                                    <span class="text-[10px] font-bold uppercase leading-none">Pesanan</span>
-                                    <span class="text-lg font-extrabold uppercase leading-tight">Online</span>
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="my-3 border-t-2 border-dashed border-gray-400"></div>
-
-                        {{-- Item besar & jelas --}}
-                        <div class="space-y-2.5">
-                            @foreach ($vendorItems as $item)
-                                <div class="flex items-start gap-3">
-                                    <span class="flex h-9 w-12 shrink-0 items-center justify-center rounded border-2 border-gray-900 text-lg font-extrabold">{{ $item->qty }}×</span>
-                                    <span class="pt-1 text-lg font-bold uppercase leading-tight">{{ $item->name_snapshot }}</span>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <div class="my-3 border-t-2 border-dashed border-gray-400"></div>
-
-                        <p class="text-center text-xs font-semibold text-gray-600">Total {{ $vendorItems->sum('qty') }} porsi</p>
-                    </div>
-                @endforeach
-            </div>
         </div>
     @endif
 
