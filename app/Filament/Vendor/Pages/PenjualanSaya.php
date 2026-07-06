@@ -23,13 +23,6 @@ class PenjualanSaya extends Page
 
     protected static ?int $navigationSort = 1;
 
-    public ?string $date = null;
-
-    public function mount(): void
-    {
-        $this->date = now()->toDateString();
-    }
-
     /**
      * Jadikan halaman ini sebagai beranda panel vendor (/vendor).
      */
@@ -44,20 +37,34 @@ class PenjualanSaya extends Page
     }
 
     /**
-     * Item terjual milik vendor ini pada tanggal terpilih (hanya order lunas).
+     * Vendor dikunci HANYA melihat hari berjalan (hari ini, WIB). Dikunci di
+     * server — tak ada pilihan tanggal, jadi tanggal lampau tak bisa diintip.
+     */
+    private function today(): Carbon
+    {
+        return Carbon::today();
+    }
+
+    public function getTanggalLabelProperty(): string
+    {
+        return $this->today()->translatedFormat('l, d M Y');
+    }
+
+    /**
+     * Item terjual milik vendor ini hari ini (hanya order lunas).
      */
     public function getItemsProperty(): Collection
     {
         $vendor = $this->vendor;
 
-        if (! $vendor || ! $this->date) {
+        if (! $vendor) {
             return collect();
         }
 
-        $date = Carbon::parse($this->date);
+        $today = $this->today();
 
         return app(SettlementService::class)
-            ->vendorMenuBreakdown($vendor->id, $date->copy()->startOfDay(), $date->copy()->endOfDay());
+            ->vendorMenuBreakdown($vendor->id, $today->copy()->startOfDay(), $today->copy()->endOfDay());
     }
 
     /**
@@ -67,13 +74,13 @@ class PenjualanSaya extends Page
     {
         $vendor = $this->vendor;
 
-        if (! $vendor || ! $this->date) {
+        if (! $vendor) {
             return ['count' => 0, 'qty' => 0, 'base_owed' => 0];
         }
 
-        $date = Carbon::parse($this->date);
+        $today = $this->today();
 
         return app(SettlementService::class)
-            ->vendorTotals($vendor->id, $date->copy()->startOfDay(), $date->copy()->endOfDay());
+            ->vendorTotals($vendor->id, $today->copy()->startOfDay(), $today->copy()->endOfDay());
     }
 }

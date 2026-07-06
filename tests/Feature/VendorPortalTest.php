@@ -80,9 +80,31 @@ class VendorPortalTest extends TestCase
 
         \Livewire\Livewire::actingAs($this->vendorUser)
             ->test(PenjualanSaya::class)
-            ->assertSet('date', now()->toDateString())
             ->assertSee('Menu A')
             ->assertSee('20.000')      // jatah saya (base) = 10.000 * 2
             ->assertDontSee('24.000'); // harga jual/margin owner TIDAK boleh tampil ke vendor
+    }
+
+    public function test_penjualan_saya_dikunci_hanya_hari_ini(): void
+    {
+        // Penjualan KEMARIN tak boleh muncul — vendor hanya lihat hari berjalan.
+        $order = Order::create([
+            'location_id' => $this->vendorA->location_id,
+            'order_number' => Order::generateOrderNumber(),
+            'status' => 'paid', 'payment_method' => 'cash',
+            'total_amount' => 90000, 'paid_amount' => 90000, 'change_amount' => 0,
+            'paid_at' => now()->subDay(),
+        ]);
+        $order->items()->create([
+            'menu_item_id' => $this->itemA->id, 'vendor_id' => $this->vendorA->id,
+            'name_snapshot' => 'Menu Kemarin', 'qty' => 9,
+            'base_price_snapshot' => 10000, 'margin_snapshot' => 2000,
+            'selling_price_snapshot' => 12000, 'line_total' => 108000,
+        ]);
+
+        \Livewire\Livewire::actingAs($this->vendorUser)
+            ->test(PenjualanSaya::class)
+            ->assertSee('Hari Ini')             // hanya label hari berjalan
+            ->assertDontSee('Menu Kemarin');    // data kemarin tak tampil
     }
 }

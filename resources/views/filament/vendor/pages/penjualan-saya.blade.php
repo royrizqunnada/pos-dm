@@ -6,10 +6,9 @@
             <p class="text-sm text-gray-500">Vendor</p>
             <p class="text-lg font-bold text-gray-900">{{ optional($this->vendor)->name ?? '—' }}</p>
         </div>
-        <div class="w-full sm:w-56">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
-            <input type="date" wire:model.live="date"
-                class="block w-full rounded-lg border-gray-300 text-sm focus:border-primary-500 focus:ring-primary-500" />
+        <div class="text-left sm:text-right">
+            <p class="text-sm text-gray-500">Hari Ini</p>
+            <p class="text-base font-semibold text-gray-900">{{ $this->tanggalLabel }}</p>
         </div>
     </div>
 
@@ -44,7 +43,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="3" class="px-4 py-10 text-center text-gray-400">Belum ada penjualan pada tanggal ini.</td>
+                        <td colspan="3" class="px-4 py-10 text-center text-gray-400">Belum ada penjualan hari ini.</td>
                     </tr>
                 @endforelse
             </tbody>
