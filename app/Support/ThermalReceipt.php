@@ -200,6 +200,16 @@ class ThermalReceipt
             return '';
         }
 
+        // Logo statis: raster dihitung SEKALI lalu di-cache (berat: decode 6MP
+        // + dither). Key ikut filemtime → otomatis segar bila logo diganti.
+        return \Illuminate\Support\Facades\Cache::rememberForever(
+            'thermal.logo.'.$dots.'.'.((string) @filemtime($path)),
+            fn (): string => self::buildLogoRaster($path, $dots),
+        );
+    }
+
+    private static function buildLogoRaster(string $path, int $dots): string
+    {
         $src = @imagecreatefrompng($path);
         if (! $src) {
             return '';
