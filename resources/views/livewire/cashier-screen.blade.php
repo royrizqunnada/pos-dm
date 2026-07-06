@@ -4,7 +4,15 @@
         cartOpen: false,
         printMode: 'receipt',
         doPrint(mode) { this.printMode = mode; this.$nextTick(() => window.print()); },
-        rawbt(b64) { if (b64) { window.location.href = 'rawbt:base64,' + b64; } },
+        rawbt(b64) {
+            if (!b64) { alert('Data cetak kosong — coba ulangi.'); return; }
+            const a = document.createElement('a');
+            a.href = 'rawbt:base64,' + b64;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => a.remove(), 2000);
+        },
     }"
     :class="printMode === 'kitchen' ? 'mode-kitchen' : 'mode-receipt'">
     <style>
