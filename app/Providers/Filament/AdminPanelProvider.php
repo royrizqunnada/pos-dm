@@ -42,13 +42,7 @@ class AdminPanelProvider extends PanelProvider
             ->maxContentWidth(Width::ScreenTwoExtraLarge)
             ->sidebarCollapsibleOnDesktop()
             ->colors([
-                // Orange DM Kuliner (selaras logo). Shade gelap oranye-kecoklatan
-                // supaya teks putih di tombol tetap terbaca.
-                'primary' => [
-                    50 => '#fdf6ec', 100 => '#f9e6c6', 200 => '#f3cd89', 300 => '#eeb14e',
-                    400 => '#e9971f', 500 => '#d97706', 600 => '#b45309', 700 => '#92400e',
-                    800 => '#78350f', 900 => '#633012', 950 => '#3f1e0a',
-                ],
+                'primary' => \App\Support\Brand::primary(),
                 'gray' => Color::Stone, // netral hangat, cocok dengan coklat/orange
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

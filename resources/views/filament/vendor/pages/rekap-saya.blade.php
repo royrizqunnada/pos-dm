@@ -1,6 +1,5 @@
 <x-filament-panels::page>
     @php($totals = $this->totals)
-    @php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 
     {{-- Filter periode --}}
     <div class="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
@@ -35,7 +34,7 @@
         </div>
         <div class="rounded-xl border border-primary-200 bg-primary-50 p-5 dark:border-primary-500/30 dark:bg-primary-500/10">
             <p class="text-sm font-medium text-primary-700 dark:text-primary-300">Jatah Saya (Diterima)</p>
-            <p class="mt-1 text-2xl font-bold text-primary-700 dark:text-primary-300">{{ $rp($totals['base_owed']) }}</p>
+            <p class="mt-1 text-2xl font-bold text-primary-700 dark:text-primary-300">{{ rupiah($totals['base_owed']) }}</p>
         </div>
     </div>
 
@@ -59,7 +58,7 @@
                         <td class="px-4 py-3 text-gray-400">{{ $i + 1 }}</td>
                         <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">{{ $item->name }}</td>
                         <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300">{{ number_format($item->qty, 0, ',', '.') }}</td>
-                        <td class="px-4 py-3 text-right font-semibold text-primary-600 dark:text-primary-400">{{ $rp($item->base_owed) }}</td>
+                        <td class="px-4 py-3 text-right font-semibold text-primary-600 dark:text-primary-400">{{ rupiah($item->base_owed) }}</td>
                     </tr>
                 @empty
                     <tr>
@@ -72,7 +71,7 @@
                     <tr class="border-t-2 border-gray-200 bg-gray-50 font-bold text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white">
                         <td class="px-4 py-3" colspan="2">TOTAL</td>
                         <td class="px-4 py-3 text-right">{{ number_format($totals['qty'], 0, ',', '.') }}</td>
-                        <td class="px-4 py-3 text-right text-primary-700 dark:text-primary-300">{{ $rp($totals['base_owed']) }}</td>
+                        <td class="px-4 py-3 text-right text-primary-700 dark:text-primary-300">{{ rupiah($totals['base_owed']) }}</td>
                     </tr>
                 </tfoot>
             @endif

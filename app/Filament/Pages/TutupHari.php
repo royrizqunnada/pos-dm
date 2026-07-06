@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ExportsSettlement;
 use App\Models\Location;
 use App\Services\SettlementService;
 use BackedEnum;
@@ -10,10 +11,13 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Pages\Page;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class TutupHari extends Page
 {
+    use ExportsSettlement;
+
     protected string $view = 'filament.pages.tutup-hari';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
@@ -88,58 +92,24 @@ class TutupHari extends Page
         ];
     }
 
-    public function exportPdf(): \Symfony\Component\HttpFoundation\Response
+    public function exportPdf(): Response
     {
-        $rows = $this->rows;
         $location = Location::find($this->locationId);
 
-        return \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.settlement', [
-            'title' => 'Tutup Hari / Settlement Vendor',
-            'periodLabel' => 'Tanggal '.Carbon::parse($this->date)->translatedFormat('l, d M Y'),
-            'location' => $location,
-            'rows' => $rows,
-            'totals' => app(SettlementService::class)->totals($rows),
-        ])->setPaper('a4', 'portrait')
-            ->download('settlement-'.($location?->id ?? 'loc').'-'.$this->date.'.pdf');
+        return $this->settlementPdf(
+            'Tutup Hari / Settlement Vendor',
+            'Tanggal '.Carbon::parse($this->date)->translatedFormat('l, d M Y'),
+            'settlement-'.($location?->id ?? 'loc').'-'.$this->date.'.pdf',
+        );
     }
 
     public function exportCsv(): StreamedResponse
     {
-        $rows = $this->rows;
         $location = Location::find($this->locationId);
-        $filename = 'settlement-'.($location?->id ?? 'loc').'-'.$this->date.'.csv';
 
-        return response()->streamDownload(function () use ($rows, $location) {
-            $out = fopen('php://output', 'w');
-
-            fputcsv($out, ['Lokasi', $location?->name ?? '-']);
-            fputcsv($out, ['Tanggal', $this->date]);
-            fputcsv($out, []);
-            fputcsv($out, [
-                'Kode Vendor', 'Nama Vendor', 'Rekening', 'Jml Transaksi',
-                'Dibayar ke Vendor (Harga Dasar)', 'Margin Saya', 'Total Kotor',
-            ]);
-
-            foreach ($rows as $r) {
-                fputcsv($out, [
-                    $r['code'],
-                    $r['name'],
-                    $r['payout_account'] ?? '',
-                    $r['order_count'],
-                    $r['total_base_owed'],
-                    $r['total_margin'],
-                    $r['total_gross'],
-                ]);
-            }
-
-            $totals = app(SettlementService::class)->totals($rows);
-            fputcsv($out, []);
-            fputcsv($out, [
-                'TOTAL', '', '', $totals['order_count'],
-                $totals['total_base_owed'], $totals['total_margin'], $totals['total_gross'],
-            ]);
-
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
+        return $this->settlementCsv([
+            ['Lokasi', $location?->name ?? '-'],
+            ['Tanggal', $this->date],
+        ], 'settlement-'.($location?->id ?? 'loc').'-'.$this->date.'.csv');
     }
 }

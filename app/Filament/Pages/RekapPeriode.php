@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Concerns\ExportsSettlement;
 use App\Models\Location;
 use App\Services\SettlementService;
 use BackedEnum;
@@ -10,10 +11,13 @@ use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class RekapPeriode extends Page
 {
+    use ExportsSettlement;
+
     protected string $view = 'filament.pages.rekap-periode';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBarSquare;
@@ -134,48 +138,25 @@ class RekapPeriode extends Page
         ];
     }
 
-    public function exportPdf(): \Symfony\Component\HttpFoundation\Response
+    public function exportPdf(): Response
     {
-        $rows = $this->rows;
-        $location = Location::find($this->locationId);
         $from = Carbon::parse($this->from)->translatedFormat('d M Y');
         $to = Carbon::parse($this->to)->translatedFormat('d M Y');
 
-        return \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.settlement', [
-            'title' => 'Rekap Penjualan per Vendor',
-            'periodLabel' => 'Periode '.$from.' – '.$to,
-            'location' => $location,
-            'rows' => $rows,
-            'totals' => app(SettlementService::class)->totals($rows),
-        ])->setPaper('a4', 'portrait')
-            ->download('rekap-'.$this->from.'_sd_'.$this->to.'.pdf');
+        return $this->settlementPdf(
+            'Rekap Penjualan per Vendor',
+            'Periode '.$from.' – '.$to,
+            'rekap-'.$this->from.'_sd_'.$this->to.'.pdf',
+        );
     }
 
     public function exportCsv(): StreamedResponse
     {
-        $rows = $this->rows;
         $location = Location::find($this->locationId);
-        $filename = 'rekap-'.$this->from.'_sd_'.$this->to.'.csv';
 
-        return response()->streamDownload(function () use ($rows, $location) {
-            $out = fopen('php://output', 'w');
-            fputcsv($out, ['Lokasi', $location?->name ?? '-']);
-            fputcsv($out, ['Periode', $this->from.' s/d '.$this->to]);
-            fputcsv($out, []);
-            fputcsv($out, ['Kode', 'Vendor', 'Rekening', 'Transaksi', 'Dibayar ke Vendor', 'Margin Saya', 'Total Kotor']);
-
-            foreach ($rows as $r) {
-                fputcsv($out, [
-                    $r['code'], $r['name'], $r['payout_account'] ?? '',
-                    $r['order_count'], $r['total_base_owed'], $r['total_margin'], $r['total_gross'],
-                ]);
-            }
-
-            $t = app(SettlementService::class)->totals($rows);
-            fputcsv($out, []);
-            fputcsv($out, ['TOTAL', '', '', $t['order_count'], $t['total_base_owed'], $t['total_margin'], $t['total_gross']]);
-
-            fclose($out);
-        }, $filename, ['Content-Type' => 'text/csv']);
+        return $this->settlementCsv([
+            ['Lokasi', $location?->name ?? '-'],
+            ['Periode', $this->from.' s/d '.$this->to],
+        ], 'rekap-'.$this->from.'_sd_'.$this->to.'.csv');
     }
 }

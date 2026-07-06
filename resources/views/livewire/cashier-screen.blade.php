@@ -1,4 +1,3 @@
-@php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <div class="pos-root flex h-screen flex-col bg-slate-50"
     x-data="{
         cartOpen: false,
@@ -112,7 +111,7 @@
                                         x-transition:leave-end="opacity-0 -translate-y-4"
                                         class="pointer-events-none absolute -top-2 right-2 z-10 rounded-full bg-primary-600 px-2 py-0.5 text-xs font-bold text-white shadow-md">+1</span>
                                     <span class="line-clamp-2 text-sm font-medium text-gray-900">{{ $item->name }}</span>
-                                    <span class="mt-2 text-base font-bold text-gray-900">{{ $rp($item->selling_price) }}</span>
+                                    <span class="mt-2 text-base font-bold text-gray-900">{{ rupiah($item->selling_price) }}</span>
                                 </button>
                             @endforeach
                         </div>
@@ -150,7 +149,7 @@
                         <div class="flex items-start justify-between gap-2">
                             <div class="min-w-0">
                                 <p class="truncate text-sm font-medium text-gray-900">{{ $line['name'] }}</p>
-                                <p class="text-xs text-gray-500">{{ $line['vendor_code'] }} · {{ $rp($line['selling_price']) }}</p>
+                                <p class="text-xs text-gray-500">{{ $line['vendor_code'] }} · {{ rupiah($line['selling_price']) }}</p>
                             </div>
                             <button wire:click="removeItem({{ $id }})" class="text-gray-300 hover:text-red-500">
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
@@ -162,7 +161,7 @@
                                 <span class="w-8 text-center text-base font-semibold">{{ $line['qty'] }}</span>
                                 <button wire:click="increment({{ $id }})" class="flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-lg font-bold text-gray-700 active:scale-95">+</button>
                             </div>
-                            <span class="text-sm font-bold text-gray-900">{{ $rp($line['selling_price'] * $line['qty']) }}</span>
+                            <span class="text-sm font-bold text-gray-900">{{ rupiah($line['selling_price'] * $line['qty']) }}</span>
                         </div>
                     </div>
                 @empty
@@ -178,7 +177,7 @@
             <div class="border-t border-gray-200 px-4 py-4">
                 <div class="mb-3 flex items-end justify-between">
                     <span class="text-sm text-gray-500">Total</span>
-                    <span class="text-3xl font-extrabold text-gray-900">{{ $rp($this->cartTotal) }}</span>
+                    <span class="text-3xl font-extrabold text-gray-900">{{ rupiah($this->cartTotal) }}</span>
                 </div>
                 <button wire:click="openPay" @click="cartOpen = false" @disabled(empty($cart))
                     class="w-full rounded-xl bg-primary-600 py-4 text-lg font-bold tracking-wide text-white shadow-lg shadow-primary-600/25 transition hover:bg-primary-700 active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:shadow-none">
@@ -196,7 +195,7 @@
                 <span class="flex h-6 min-w-6 items-center justify-center rounded-full bg-white/25 px-1.5 text-xs font-bold">{{ $this->cartCount }}</span>
                 Lihat Keranjang
             </span>
-            <span class="text-base font-bold">{{ $rp($this->cartTotal) }}</span>
+            <span class="text-base font-bold">{{ rupiah($this->cartTotal) }}</span>
         </button>
     </div>
 
@@ -498,10 +497,10 @@
                 <p class="mb-4 text-sm text-gray-500">Dibuka {{ $shift->opened_at->format('d/m H:i') }} · {{ $t['count'] }} transaksi</p>
 
                 <div class="space-y-2 rounded-xl bg-slate-50 p-4 text-sm">
-                    <div class="flex justify-between text-gray-600"><span>Kas Awal</span><span>{{ $rp($shift->opening_cash) }}</span></div>
-                    <div class="flex justify-between text-gray-600"><span>Penjualan Tunai</span><span>{{ $rp($t['cash']) }}</span></div>
-                    <div class="flex justify-between font-semibold text-gray-900 border-t border-gray-200 pt-2"><span>Kas Seharusnya</span><span>{{ $rp($expected) }}</span></div>
-                    <div class="flex justify-between text-gray-600"><span>Penjualan QRIS</span><span>{{ $rp($t['qris']) }}</span></div>
+                    <div class="flex justify-between text-gray-600"><span>Kas Awal</span><span>{{ rupiah($shift->opening_cash) }}</span></div>
+                    <div class="flex justify-between text-gray-600"><span>Penjualan Tunai</span><span>{{ rupiah($t['cash']) }}</span></div>
+                    <div class="flex justify-between font-semibold text-gray-900 border-t border-gray-200 pt-2"><span>Kas Seharusnya</span><span>{{ rupiah($expected) }}</span></div>
+                    <div class="flex justify-between text-gray-600"><span>Penjualan QRIS</span><span>{{ rupiah($t['qris']) }}</span></div>
                 </div>
 
                 <div class="mt-4">
@@ -517,7 +516,7 @@
                             'bg-yellow-50 text-yellow-700' => $variance !== 0,
                         ])>
                             <span class="text-sm font-medium">Selisih</span>
-                            <span class="text-xl font-bold">{{ $variance > 0 ? '+' : '' }}{{ $rp($variance) }}</span>
+                            <span class="text-xl font-bold">{{ $variance > 0 ? '+' : '' }}{{ rupiah($variance) }}</span>
                         </div>
                         @if ($variance < 0)
                             <p class="mt-1 text-xs text-red-500">Kas kurang dari seharusnya.</p>

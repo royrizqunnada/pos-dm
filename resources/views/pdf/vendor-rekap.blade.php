@@ -1,4 +1,3 @@
-@php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -34,7 +33,7 @@
         <tr>
             <td><div class="lbl">Transaksi</div><div class="val">{{ number_format($totals['count'], 0, ',', '.') }}</div></td>
             <td><div class="lbl">Total Porsi Terjual</div><div class="val">{{ number_format($totals['qty'], 0, ',', '.') }}</div></td>
-            <td><div class="lbl">Jatah Diterima</div><div class="val accent">{{ $rp($totals['base_owed']) }}</div></td>
+            <td><div class="lbl">Jatah Diterima</div><div class="val accent">{{ rupiah($totals['base_owed']) }}</div></td>
         </tr>
     </table>
 
@@ -53,7 +52,7 @@
                     <td>{{ $i + 1 }}</td>
                     <td>{{ $item->name }}</td>
                     <td class="r">{{ number_format($item->qty, 0, ',', '.') }}</td>
-                    <td class="r accent">{{ $rp($item->base_owed) }}</td>
+                    <td class="r accent">{{ rupiah($item->base_owed) }}</td>
                 </tr>
             @empty
                 <tr><td colspan="4" style="text-align:center; color:#9ca3af; padding:18px;">Belum ada penjualan pada periode ini.</td></tr>
@@ -64,7 +63,7 @@
                 <tr>
                     <td colspan="2">TOTAL</td>
                     <td class="r">{{ number_format($totals['qty'], 0, ',', '.') }}</td>
-                    <td class="r accent">{{ $rp($totals['base_owed']) }}</td>
+                    <td class="r accent">{{ rupiah($totals['base_owed']) }}</td>
                 </tr>
             </tfoot>
         @endif

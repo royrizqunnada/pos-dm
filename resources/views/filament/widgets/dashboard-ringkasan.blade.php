@@ -1,4 +1,3 @@
-@php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <x-filament-widgets::widget>
     <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {{-- ===== Top vendor hari ini (2/3) ===== --}}
@@ -23,7 +22,7 @@
                                 <span class="truncate font-medium text-gray-900 dark:text-white">{{ $vendor->name }}</span>
                                 <span class="shrink-0 text-xs text-gray-400">{{ number_format($vendor->qty, 0, ',', '.') }} item</span>
                             </div>
-                            <span class="shrink-0 font-semibold text-gray-950 dark:text-white">{{ $rp($vendor->base_owed) }}</span>
+                            <span class="shrink-0 font-semibold text-gray-950 dark:text-white">{{ rupiah($vendor->base_owed) }}</span>
                         </div>
                         <div class="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-white/5">
                             <div class="h-full rounded-full bg-primary-500" style="width: {{ max(4, round($vendor->base_owed / $maxBase * 100)) }}%"></div>
@@ -48,16 +47,16 @@
             </div>
             <div class="px-5 py-5">
                 <p class="text-[11px] font-semibold uppercase tracking-[0.06em] text-gray-500 dark:text-gray-400">Margin Saya</p>
-                <p class="mt-1 text-3xl font-bold tracking-tight text-gray-950 dark:text-white">{{ $rp($month['total_margin']) }}</p>
+                <p class="mt-1 text-3xl font-bold tracking-tight text-gray-950 dark:text-white">{{ rupiah($month['total_margin']) }}</p>
 
                 <dl class="mt-5 space-y-3 border-t border-dashed border-gray-200 pt-4 text-sm dark:border-white/10">
                     <div class="flex items-center justify-between">
                         <dt class="text-gray-500 dark:text-gray-400">Total Penjualan</dt>
-                        <dd class="font-semibold text-gray-900 dark:text-white">{{ $rp($month['total_gross']) }}</dd>
+                        <dd class="font-semibold text-gray-900 dark:text-white">{{ rupiah($month['total_gross']) }}</dd>
                     </div>
                     <div class="flex items-center justify-between">
                         <dt class="text-gray-500 dark:text-gray-400">Dibayar ke Vendor</dt>
-                        <dd class="font-semibold text-gray-900 dark:text-white">{{ $rp($month['total_base_owed']) }}</dd>
+                        <dd class="font-semibold text-gray-900 dark:text-white">{{ rupiah($month['total_base_owed']) }}</dd>
                     </div>
                     <div class="flex items-center justify-between">
                         <dt class="text-gray-500 dark:text-gray-400">Transaksi</dt>

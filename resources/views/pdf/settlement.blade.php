@@ -1,4 +1,3 @@
-@php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -33,9 +32,9 @@
     <table class="kpis">
         <tr>
             <td><div class="lbl">Total Transaksi</div><div class="val">{{ number_format($totals['order_count'], 0, ',', '.') }}</div></td>
-            <td><div class="lbl">Total Uang Masuk</div><div class="val">{{ $rp($totals['total_gross']) }}</div></td>
-            <td><div class="lbl">Dibayar ke Vendor</div><div class="val">{{ $rp($totals['total_base_owed']) }}</div></td>
-            <td><div class="lbl">Margin Saya</div><div class="val accent">{{ $rp($totals['total_margin']) }}</div></td>
+            <td><div class="lbl">Total Uang Masuk</div><div class="val">{{ rupiah($totals['total_gross']) }}</div></td>
+            <td><div class="lbl">Dibayar ke Vendor</div><div class="val">{{ rupiah($totals['total_base_owed']) }}</div></td>
+            <td><div class="lbl">Margin Saya</div><div class="val accent">{{ rupiah($totals['total_margin']) }}</div></td>
         </tr>
     </table>
 
@@ -57,9 +56,9 @@
                     <td>{{ $row['code'] }}</td>
                     <td>{{ $row['name'] }}</td>
                     <td class="r">{{ number_format($row['order_count'], 0, ',', '.') }}</td>
-                    <td class="r">{{ $rp($row['total_base_owed']) }}</td>
-                    <td class="r accent">{{ $rp($row['total_margin']) }}</td>
-                    <td class="r">{{ $rp($row['total_gross']) }}</td>
+                    <td class="r">{{ rupiah($row['total_base_owed']) }}</td>
+                    <td class="r accent">{{ rupiah($row['total_margin']) }}</td>
+                    <td class="r">{{ rupiah($row['total_gross']) }}</td>
                     <td>{{ $row['payout_account'] ?: '—' }}</td>
                 </tr>
             @empty
@@ -71,9 +70,9 @@
                 <tr>
                     <td colspan="2">TOTAL</td>
                     <td class="r">{{ number_format($totals['order_count'], 0, ',', '.') }}</td>
-                    <td class="r">{{ $rp($totals['total_base_owed']) }}</td>
-                    <td class="r accent">{{ $rp($totals['total_margin']) }}</td>
-                    <td class="r">{{ $rp($totals['total_gross']) }}</td>
+                    <td class="r">{{ rupiah($totals['total_base_owed']) }}</td>
+                    <td class="r accent">{{ rupiah($totals['total_margin']) }}</td>
+                    <td class="r">{{ rupiah($totals['total_gross']) }}</td>
                     <td></td>
                 </tr>
             </tfoot>

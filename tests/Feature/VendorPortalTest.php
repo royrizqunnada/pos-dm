@@ -82,7 +82,7 @@ class VendorPortalTest extends TestCase
             ->test(PenjualanSaya::class)
             ->assertSet('date', now()->toDateString())
             ->assertSee('Menu A')
-            ->assertSee('20.000')  // jatah saya = 10.000 * 2
-            ->assertSee('24.000'); // total terjual = 12.000 * 2
+            ->assertSee('20.000')      // jatah saya (base) = 10.000 * 2
+            ->assertDontSee('24.000'); // harga jual/margin owner TIDAK boleh tampil ke vendor
     }
 }

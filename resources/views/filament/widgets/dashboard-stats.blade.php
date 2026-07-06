@@ -1,4 +1,3 @@
-@php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
 <x-filament-widgets::widget>
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ($stats as $st)
@@ -9,7 +8,7 @@
                 <p class="text-[11px] font-semibold uppercase tracking-[0.06em] text-gray-500 dark:text-gray-400">{{ $st['label'] }}</p>
 
                 <p class="mt-2 text-[1.6rem] font-bold leading-none tracking-tight text-gray-950 dark:text-white sm:text-3xl">
-                    {{ $st['money'] ? $rp($st['value']) : number_format($st['value'], 0, ',', '.') }}@if (! empty($st['suffix']))<span class="text-sm font-medium text-gray-400"> {{ $st['suffix'] }}</span>@endif
+                    {{ $st['money'] ? rupiah($st['value']) : number_format($st['value'], 0, ',', '.') }}@if (! empty($st['suffix']))<span class="text-sm font-medium text-gray-400"> {{ $st['suffix'] }}</span>@endif
                 </p>
 
                 <div class="mt-4 flex items-end justify-between gap-3">

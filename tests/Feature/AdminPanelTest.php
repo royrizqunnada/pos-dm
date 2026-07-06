@@ -43,8 +43,8 @@ class AdminPanelTest extends TestCase
         \Livewire\Livewire::actingAs($this->makeUser('owner'))
             ->test(\App\Filament\Widgets\DashboardRingkasan::class)
             ->assertOk()
-            ->assertSee('Ringkasan Hari Ini')
-            ->assertSee('Top Vendor Hari Ini');
+            ->assertSee('Top Vendor Hari Ini')
+            ->assertSee('Bulan Ini');
     }
 
     public function test_owner_can_open_settlement_page(): void

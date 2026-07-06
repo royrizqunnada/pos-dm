@@ -1,5 +1,4 @@
 <x-filament-panels::page>
-    @php($rp = fn ($n) => 'Rp '.number_format((int) $n, 0, ',', '.'))
     @php($totals = $this->totals)
 
     {{-- Filter --}}
@@ -34,9 +33,9 @@
     <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         @php($kpis = [
             ['label' => 'Total Transaksi', 'value' => number_format($totals['order_count'], 0, ',', '.'), 'icon' => 'M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z', 'accent' => false],
-            ['label' => 'Total Penjualan', 'value' => $rp($totals['total_gross']), 'icon' => 'M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z', 'accent' => false],
-            ['label' => 'Dibayar ke Vendor', 'value' => $rp($totals['total_base_owed']), 'icon' => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z', 'accent' => false],
-            ['label' => 'Margin Saya', 'value' => $rp($totals['total_margin']), 'icon' => 'M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941', 'accent' => true],
+            ['label' => 'Total Penjualan', 'value' => rupiah($totals['total_gross']), 'icon' => 'M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z', 'accent' => false],
+            ['label' => 'Dibayar ke Vendor', 'value' => rupiah($totals['total_base_owed']), 'icon' => 'M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z', 'accent' => false],
+            ['label' => 'Margin Saya', 'value' => rupiah($totals['total_margin']), 'icon' => 'M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941', 'accent' => true],
         ])
         @foreach ($kpis as $kpi)
             <div @class([
@@ -90,11 +89,11 @@
                         <div class="mt-3 grid grid-cols-2 gap-2 text-center">
                             <div class="rounded-lg bg-gray-50 py-2 dark:bg-white/5">
                                 <p class="text-[10px] font-medium uppercase tracking-wide text-gray-400">Dibayar ke Vendor</p>
-                                <p class="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white">{{ $rp($row['total_base_owed']) }}</p>
+                                <p class="mt-0.5 text-sm font-semibold text-gray-900 dark:text-white">{{ rupiah($row['total_base_owed']) }}</p>
                             </div>
                             <div class="rounded-lg bg-primary-50 py-2 dark:bg-primary-500/10">
                                 <p class="text-[10px] font-medium uppercase tracking-wide text-primary-500/80">Margin Saya</p>
-                                <p class="mt-0.5 text-sm font-bold text-primary-600 dark:text-primary-400">{{ $rp($row['total_margin']) }}</p>
+                                <p class="mt-0.5 text-sm font-bold text-primary-600 dark:text-primary-400">{{ rupiah($row['total_margin']) }}</p>
                             </div>
                         </div>
                     </div>
@@ -108,7 +107,7 @@
                 @if ($this->rows->isNotEmpty())
                     <div class="flex items-center justify-between bg-gray-50 px-4 py-3 dark:bg-white/5">
                         <span class="text-sm font-bold text-gray-900 dark:text-white">TOTAL ({{ number_format($totals['order_count'], 0, ',', '.') }} trx)</span>
-                        <span class="text-sm font-bold text-primary-700 dark:text-primary-300">{{ $rp($totals['total_margin']) }}</span>
+                        <span class="text-sm font-bold text-primary-700 dark:text-primary-300">{{ rupiah($totals['total_margin']) }}</span>
                     </div>
                 @endif
             </div>
@@ -132,8 +131,8 @@
                                 <span class="ml-2 font-medium text-gray-900 dark:text-white">{{ $row['name'] }}</span>
                             </td>
                             <td class="px-4 py-3 text-right text-gray-700 dark:text-gray-300 sm:px-5">{{ number_format($row['order_count'], 0, ',', '.') }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right text-gray-900 dark:text-white sm:px-5">{{ $rp($row['total_base_owed']) }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right font-semibold text-primary-600 dark:text-primary-400 sm:px-5">{{ $rp($row['total_margin']) }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-right text-gray-900 dark:text-white sm:px-5">{{ rupiah($row['total_base_owed']) }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-right font-semibold text-primary-600 dark:text-primary-400 sm:px-5">{{ rupiah($row['total_margin']) }}</td>
                         </tr>
                     @empty
                         <tr>
@@ -150,8 +149,8 @@
                         <tr class="border-t-2 border-gray-200 bg-gray-50 font-bold text-gray-900 dark:border-white/10 dark:bg-white/5 dark:text-white">
                             <td class="px-4 py-3 sm:px-5">TOTAL</td>
                             <td class="px-4 py-3 text-right sm:px-5">{{ number_format($totals['order_count'], 0, ',', '.') }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right sm:px-5">{{ $rp($totals['total_base_owed']) }}</td>
-                            <td class="whitespace-nowrap px-4 py-3 text-right text-primary-700 dark:text-primary-300 sm:px-5">{{ $rp($totals['total_margin']) }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-right sm:px-5">{{ rupiah($totals['total_base_owed']) }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-right text-primary-700 dark:text-primary-300 sm:px-5">{{ rupiah($totals['total_margin']) }}</td>
                         </tr>
                     </tfoot>
                 @endif
