@@ -4,7 +4,6 @@ namespace App\Filament\Concerns;
 
 use App\Models\Location;
 use App\Services\SettlementService;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
@@ -14,17 +13,26 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 trait ExportsSettlement
 {
-    protected function settlementPdf(string $title, string $periodLabel, string $filename): Response
+    protected function settlementPdf(string $title, string $periodLabel, string $filename): StreamedResponse
     {
         $rows = $this->rows;
 
-        return \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.settlement', [
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.settlement', [
             'title' => $title,
             'periodLabel' => $periodLabel,
             'location' => Location::find($this->locationId),
             'rows' => $rows,
             'totals' => app(SettlementService::class)->totals($rows),
-        ])->setPaper('a4', 'portrait')->download($filename);
+        ])->setPaper('a4', 'portrait');
+
+        // streamDownload: Livewire mengenalinya sebagai unduhan biner. Kalau pakai
+        // ->download() (Response biasa), Livewire coba JSON-encode isi PDF -> error
+        // "Malformed UTF-8".
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            $filename,
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 
     /**

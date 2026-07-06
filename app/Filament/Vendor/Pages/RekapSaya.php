@@ -138,12 +138,19 @@ class RekapSaya extends Page
         $from = Carbon::parse($this->from)->translatedFormat('d M Y');
         $to = Carbon::parse($this->to)->translatedFormat('d M Y');
 
-        return \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.vendor-rekap', [
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.vendor-rekap', [
             'vendor' => $vendor,
             'periodLabel' => 'Periode '.$from.' – '.$to,
             'items' => $this->items,
             'totals' => $this->totals,
-        ])->setPaper('a4', 'portrait')
-            ->download('rekap-'.($vendor?->code ?? 'vendor').'-'.$this->from.'_sd_'.$this->to.'.pdf');
+        ])->setPaper('a4', 'portrait');
+
+        // streamDownload agar dikenali Livewire sebagai unduhan biner (hindari
+        // error "Malformed UTF-8" saat isi PDF di-JSON-encode).
+        return response()->streamDownload(
+            fn () => print ($pdf->output()),
+            'rekap-'.($vendor?->code ?? 'vendor').'-'.$this->from.'_sd_'.$this->to.'.pdf',
+            ['Content-Type' => 'application/pdf'],
+        );
     }
 }
