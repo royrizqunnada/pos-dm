@@ -11,7 +11,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Muat helper global (mis. rupiah()) lewat provider — selalu aktif saat
+        // boot tanpa bergantung pada `composer dump-autoload` di tiap deploy.
+        require_once app_path('Support/helpers.php');
     }
 
     /**
