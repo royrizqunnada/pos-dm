@@ -464,9 +464,6 @@
                     <button @click="rawbt(@js($this->receiptEscpos))" class="rounded-xl bg-primary-600 py-3 text-sm font-semibold text-white hover:bg-primary-700">Cetak Struk</button>
                     <button @click="rawbt(@js($this->kitchenEscpos))" class="rounded-xl border border-primary-200 bg-primary-50 py-3 text-sm font-semibold text-primary-700 hover:bg-primary-100">Tiket Dapur</button>
                     <button wire:click="newOrder" class="col-span-2 rounded-xl bg-green-600 py-3 text-sm font-semibold text-white hover:bg-green-700">Transaksi Baru</button>
-                    {{-- Cadangan: cetak lewat dialog browser (mis. kalau RawBT bermasalah) --}}
-                    <button @click="doPrint('receipt')" class="rounded-xl border border-gray-200 py-2 text-xs font-medium text-gray-500 hover:bg-gray-50">Struk (browser)</button>
-                    <button @click="doPrint('kitchen')" class="rounded-xl border border-gray-200 py-2 text-xs font-medium text-gray-500 hover:bg-gray-50">Tiket (browser)</button>
                     @if ($order->status !== 'void')
                         <button wire:click="voidLastOrder" wire:confirm="Batalkan transaksi ini? Tidak akan dihitung di settlement."
                             class="col-span-2 rounded-xl border border-red-200 py-2 text-sm font-medium text-red-600 hover:bg-red-50">Batalkan Transaksi</button>
