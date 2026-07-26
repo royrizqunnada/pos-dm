@@ -76,6 +76,31 @@ Buka:
 | kasir@dmkuliner.test     | `password` | cashier | Hanya layar kasir              |
 | vendor@dmkuliner.test    | `password` | vendor  | Portal vendor (`/vendor`)      |
 
+### Tambah Akun Owner
+
+Dua cara, hasilnya sama:
+
+**1. Lewat panel admin** (login sebagai owner) → menu **Pengaturan → Pengguna → Buat**,
+pilih peran **Owner**.
+
+**2. Lewat terminal** (server produksi, tanpa perlu login):
+
+```bash
+php artisan user:owner nama@email.com --name="Nama Owner"
+```
+
+Kata sandi digenerate acak dan ditampilkan sekali di terminal — simpan langsung.
+Opsi lain:
+
+| Opsi          | Guna                                                     |
+|---------------|----------------------------------------------------------|
+| `--password=` | Tentukan kata sandi sendiri (kosong = digenerate acak)    |
+| `--location=` | ID atau nama lokasi (kosong = lokasi pertama)             |
+| `--force`     | Langsung promosikan akun lama jadi owner tanpa konfirmasi |
+
+Kalau email-nya sudah dipakai, perintah akan bertanya dulu sebelum mengganti peran
+dan kata sandinya — jadi aman dijalankan ulang.
+
 ## Import Menu (CSV)
 
 `php artisan import:menu` membaca `database/data/menu-dmkuliner-seed.csv`.
