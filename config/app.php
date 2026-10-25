@@ -123,4 +123,16 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Nonaktifkan Sementara (POS)
+    |--------------------------------------------------------------------------
+    |
+    | true = aplikasi ditutup untuk semua user kecuali owner & manager
+    | (lihat App\Http\Middleware\PosMaintenance).
+    |
+    */
+
+    'pos_maintenance' => (bool) env('POS_MAINTENANCE', false),
+
 ];
