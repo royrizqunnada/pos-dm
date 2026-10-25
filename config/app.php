@@ -128,7 +128,7 @@ return [
     | Nonaktifkan Sementara (POS)
     |--------------------------------------------------------------------------
     |
-    | true = aplikasi ditutup untuk semua user kecuali owner & manager
+    | true = seluruh aplikasi menampilkan "500 | Server Error" (tidak bisa login)
     | (lihat App\Http\Middleware\PosMaintenance).
     |
     */

@@ -38,33 +38,31 @@ class PosMaintenanceTest extends TestCase
         return $user;
     }
 
-    public function test_cashier_is_blocked(): void
+    public function test_login_pages_look_like_server_error(): void
+    {
+        foreach (['/', '/login', '/admin/login', '/vendor/login'] as $url) {
+            $this->get($url)
+                ->assertStatus(500)
+                ->assertSee('Server Error');
+        }
+    }
+
+    public function test_logged_in_users_are_blocked_too(): void
     {
         $this->actingAs($this->makeUser('cashier'))
             ->get('/kasir')
-            ->assertStatus(503)
-            ->assertSee('dinonaktifkan sementara');
-    }
+            ->assertStatus(500);
 
-    public function test_owner_and_manager_still_have_access(): void
-    {
         $this->actingAs($this->makeUser('owner'))
             ->get('/admin')
-            ->assertOk();
-
-        $this->actingAs($this->makeUser('manager'))
-            ->get('/kasir')
-            ->assertOk();
-    }
-
-    public function test_login_page_stays_open_for_guests(): void
-    {
-        $this->get('/login')->assertOk();
+            ->assertStatus(500);
     }
 
     public function test_app_is_open_when_flag_is_off(): void
     {
         config(['app.pos_maintenance' => false]);
+
+        $this->get('/login')->assertOk();
 
         $this->actingAs($this->makeUser('cashier'))
             ->get('/kasir')
