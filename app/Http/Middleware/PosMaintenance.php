@@ -19,7 +19,7 @@ class PosMaintenance
      * Saklar utama: true = aplikasi dinonaktifkan, false = normal kembali.
      * (Bisa juga dinyalakan lewat POS_MAINTENANCE=true di .env.)
      */
-    public const NONAKTIF = true;
+    public const NONAKTIF = false;
 
     public function handle(Request $request, Closure $next): Response
     {
