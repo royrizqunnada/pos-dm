@@ -37,12 +37,15 @@ class ShiftsTable
                 TextColumn::make('counted_cash')
                     ->label('Kas Fisik')
                     ->money('IDR', 0)
+                    ->placeholder('— tidak dihitung —')
                     ->toggleable(),
                 TextColumn::make('cash_variance')
                     ->label('Selisih')
                     ->money('IDR', 0)
-                    ->color(fn ($state) => $state == 0 ? 'success' : 'danger')
-                    ->weight('bold'),
+                    ->placeholder('—')
+                    ->tooltip(fn ($state) => $state === null ? 'Shift ditutup tanpa menghitung kas fisik' : null)
+                    ->color(fn ($state) => $state === null ? 'gray' : ($state == 0 ? 'success' : 'danger'))
+                    ->weight(fn ($state) => $state === null ? null : 'bold'),
                 TextColumn::make('order_count')
                     ->label('Transaksi')
                     ->badge(),

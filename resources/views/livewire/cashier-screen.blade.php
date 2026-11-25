@@ -459,8 +459,11 @@
 
                 <div class="mt-4">
                     <label class="mb-1 block text-sm font-medium text-gray-700">Kas Fisik Dihitung</label>
-                    <input type="number" wire:model.live="countedCash" inputmode="numeric" placeholder="0" min="0"
-                        class="w-full rounded-xl border border-gray-200 px-4 py-3 text-right text-2xl font-bold focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-100">
+                    <input type="number" wire:model.live="countedCash" inputmode="numeric" placeholder="0" min="0" required
+                        class="w-full rounded-xl border px-4 py-3 text-right text-2xl font-bold focus:outline-none focus:ring-2 {{ $errors->has('countedCash') ? 'border-red-400 focus:border-red-500 focus:ring-red-100' : 'border-gray-200 focus:border-primary-500 focus:ring-primary-100' }}">
+                    @error('countedCash')
+                        <p class="mt-1 text-xs font-medium text-red-600">{{ $message }}</p>
+                    @enderror
                     @if ($countedCash !== null && $countedCash !== '')
                         <div @class([
                             'mt-3 flex items-center justify-between rounded-xl px-4 py-3',
@@ -480,7 +483,8 @@
 
                 <div class="mt-5 grid grid-cols-2 gap-3">
                     <button wire:click="$set('showCloseShift', false)" class="rounded-xl border border-gray-200 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">Batal</button>
-                    <button wire:click="closeShift" class="rounded-xl bg-green-600 py-3 text-sm font-bold text-white hover:bg-green-700">Tutup Shift</button>
+                    <button wire:click="closeShift" @disabled($countedCash === null || $countedCash === '')
+                        class="rounded-xl bg-green-600 py-3 text-sm font-bold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300">Tutup Shift</button>
                 </div>
             </div>
         </div>
