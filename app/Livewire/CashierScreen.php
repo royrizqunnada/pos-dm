@@ -116,6 +116,7 @@ class CashierScreen extends Component
         }
 
         $this->countedCash = null;
+        $this->resetErrorBag('countedCash');
         $this->showCloseShift = true;
     }
 
@@ -127,9 +128,20 @@ class CashierScreen extends Component
             return;
         }
 
+        // Kas fisik WAJIB diisi. Tanpa ini, shift tersimpan dengan kas fisik 0
+        // dan selisih minus sebesar seluruh kas seharusnya (data rekonsiliasi palsu).
+        $this->validate(
+            ['countedCash' => ['required', 'integer', 'min:0']],
+            [
+                'countedCash.required' => 'Isi kas fisik yang dihitung dulu sebelum tutup shift.',
+                'countedCash.integer' => 'Kas fisik harus berupa angka bulat.',
+                'countedCash.min' => 'Kas fisik tidak boleh minus.',
+            ],
+        );
+
         $totals = $shift->liveSalesTotals();
         $expected = $shift->opening_cash + $totals['cash'];
-        $counted = max(0, (int) $this->countedCash);
+        $counted = (int) $this->countedCash;
 
         $shift->update([
             'closed_at' => now(),

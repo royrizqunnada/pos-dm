@@ -100,4 +100,35 @@ class ShiftTest extends TestCase
         $this->assertSame(66000, $shift->expected_cash);
         $this->assertSame(-6000, $shift->cash_variance);
     }
+
+    public function test_cannot_close_shift_without_counting_cash(): void
+    {
+        $component = Livewire::actingAs($this->cashier)->test(CashierScreen::class);
+
+        $component->call('promptOpenShift')->set('openingCash', 50000)->call('openShift');
+
+        $component->call('addToCart', $this->bakso->id)
+            ->call('openPay')->set('paymentMethod', 'cash')->set('cashReceived', 16000)
+            ->call('pay')->call('newOrder');
+
+        // Kas fisik kosong → ditolak, shift tetap berjalan, tidak ada selisih palsu.
+        $component->call('promptCloseShift')
+            ->call('closeShift')
+            ->assertHasErrors(['countedCash' => 'required'])
+            ->assertSet('showCloseShift', true);
+
+        $shift = Shift::first();
+        $this->assertSame('open', $shift->status);
+        $this->assertNull($shift->closed_at);
+        $this->assertNull($shift->counted_cash);
+        $this->assertNull($shift->cash_variance);
+
+        // Kas fisik 0 yang memang diisi (laci benar-benar kosong) tetap diterima.
+        $component->set('countedCash', 0)->call('closeShift')->assertHasNoErrors();
+
+        $shift->refresh();
+        $this->assertSame('closed', $shift->status);
+        $this->assertSame(0, $shift->counted_cash);
+        $this->assertSame(-66000, $shift->cash_variance);
+    }
 }
