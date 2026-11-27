@@ -39,6 +39,16 @@ class DatabaseSeeder extends Seeder
         );
         $owner->syncRoles(['owner']);
 
+        $owner2 = User::updateOrCreate(
+            ['email' => 'owner2@dmkuliner.test'],
+            [
+                'name' => 'Owner 2 DM Kuliner',
+                'password' => Hash::make('password'),
+                'location_id' => $location?->id,
+            ]
+        );
+        $owner2->syncRoles(['owner']);
+
         $manager = User::updateOrCreate(
             ['email' => 'manager@dmkuliner.test'],
             [
@@ -68,6 +78,7 @@ class DatabaseSeeder extends Seeder
             ['Email', 'Password', 'Role'],
             [
                 ['owner@dmkuliner.test', 'password', 'owner'],
+                ['owner2@dmkuliner.test', 'password', 'owner'],
                 ['manager@dmkuliner.test', 'password', 'manager'],
                 ['kasir@dmkuliner.test', 'password', 'cashier'],
             ]
